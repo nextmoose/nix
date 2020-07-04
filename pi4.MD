@@ -21,8 +21,8 @@ This is a documentation of the steps that I took.
 ## Procedure
 1. Hook up the pi to the keyboard and monitor.
 2. Download [the image](https://data.lunar.computer/nixos-sd-image-20.03pre206632.b0bbacb5213-aarch64-linux.img.bz2) to your computer.  Thank you [Lunar Computer](https://lunar.computer/about/) for providing the base image and for providing the base of these steps.  If I have seen farther than others, it is by standing on the shoulders of giants.
-3. Flash your SD card.  I put the card in the reader/writer and plug it into my computer and use this command `bunzip2 --stdout ~/Downloads/nixos-sd-image-20.03pre206632.b0bbacb5213-aarch64-linux.img.bz2 | sudo dd of=/dev/sda`
-`.  Let us assume that you downloaded the previously described image into your Downloads folder and your computer recognizes your card as '/dev/sda'.  In my experience this takes about 20 minutes.
+3. Flash your SD card.  I put the card in the reader/writer and plug it into my computer and use this command `BEFORE=$(date +%s) && bunzip2 --stdout ~/Downloads/nixos-sd-image-20.03pre206632.b0bbacb5213-aarch64-linux.img.bz2 | sudo dd of=/dev/sda && AFTER=$(date +%s) && echo $(((${AFTER}-${BEFORE}+60)/60))`.  I do not use the time command because I believe that would pollute the image.
+`.  Let us assume that you downloaded the previously described image into your Downloads folder and your computer recognizes your card as '/dev/sda'.  In my experience this takes about 18 minutes.  It seems that about every other time, this produces a corrupted image.  I don't know why.  If it does just try again, it will probably work next time.
 4. Eject your SD card from your computer.  Put it in your PI.
 5. Power up your pi.
 6. Wait for it to boot up.  Should not take too long.
@@ -41,27 +41,29 @@ This is a documentation of the steps that I took.
     3. make sure you have some way to login before rebooting
        1. I uncomment out the users stanza, change jane to user, and add the line `passwordFile = "/etc/nixos/password.asc"`
 13. As root, `echo ${YOUR_NEW_PASSWORD} | mkpasswd --stdin -m sha-512 > /etc/nixos/password.asc`
-14. As root, run `nixos-rebuild build`.  This should take about 20 minutes.  This builds the derivations.  This does not change anything.
-15. As root, run `nixos-rebuild test`.  This uses the new configuration but does not change it in the boot.  This changes your PI for the current boot and after rebooting no changes will persist.
-16. As root, run `nixos-rebuild switch`.  This should be very fast (because you have done the heavy lifting in the previous step).  I believe this will error.
-17. As root, run `nixos-rebuild switch` again.  Is this necessary, I don't know.  Please experiment and find out for me.  It should not error the second time.  This changes the boot.  After this, your changes should be persisted between boots.
-18. As root, reboot the PI.
-19. Wait for the pi to boot up (should not take long).
-20. Log in as user and with ${YOUR_NEW_PASSWORD}.
+14. As root, run `time nixos-rebuild build`.  This should take about 20 minutes.  This builds the derivations.  This does not change anything.
+15. As root, run `time nixos-rebuild test`.  This uses the new configuration but does not change it in the boot.  This changes your PI for the current boot and after rebooting no changes will persist.
+16. As root, run `time nixos-rebuild test` again, because the first time will have unknown errors.
+17. As root, run `time nixos-rebuild switch`.  This should be very fast (because you have done the heavy lifting in the previous step).  I believe this will error.
+18. As root, run `time nixos-rebuild switch` again.  Is this necessary, I don't know.  Please experiment and find out for me.  It should not error the second time.  This changes the boot.  After this, your changes should be persisted between boots.
+19. As root, reboot the PI.
+20. Wait for the pi to boot up (should not take long).
+21. Log in as user and with ${YOUR_NEW_PASSWORD}.
 22. Execute `sudo su --login` to get full root powers.
-22. Execute `systemctl stop wpa_supplicant.service && wpa_supplicant -B -i wlan0 -c <(wpa_passphrase "${YOUR_WIFI_SSID}" "${YOUR_WIFI_PASSWORD}") && sleep 10s && ping -c 10 8.8.8.8` to start wifi.
+23. Execute `systemctl stop wpa_supplicant.service && wpa_supplicant -B -i wlan0 -c <(wpa_passphrase "${YOUR_WIFI_SSID}" "${YOUR_WIFI_PASSWORD}") && sleep 10s && ping -c 10 8.8.8.8` to start wifi.
 
 ## Discussion
 This is perhaps an overly prescriptive summary of the steps I took to put nixos on my Raspberry Pi 4 card.
 This is probably not the best way.
 You might not need all the steps.
 
-I think Lunar Computer image has two partitions:  FIRMWARE and NIXOS.
+I think Lunar Computer image has two partitions:  FIRMWARE and NIXOS_SD.
 FIRMWARE is just the boot partition.
-NIXOS has the interesting stuff.
+NIXOS_SD has the interesting stuff.
 
 When you boot off the image, your PI's clock will be set to January 1, 1970.
 This seems to cause problems with building derivations (not sure why).
+So you need to fix the date.
 
 The PI probably would be hooked up to the internet if you plugged it in, but I do not have that capability so I have to run those command to hook it up to wifi.
 I have a little sleep because it seems to take a few seconds to actually start working.
@@ -87,3 +89,8 @@ If you run `nixos-rebuild switch` alone it will do the building and testing.
 However, if you run `nixos-rebuild build` and it fails then obviously the other two commands would have failed and you need to fix whatever is wrong.
 If you run `nixos-rebuild test` and you do not like something about the configuration (for example, you forget to enable wireless connectivity) or you locked yourself out; then you can just reboot and everything will be back as it was before.
 If you run `nixos-rebuild switch && reboot` but you do not like the results, you might have to repeat this entire process starting with reflashing the drive.  If you are locked out, I do not know any other way.
+
+I hope this is helpful to you.
+I do not believe it is the best way to do things, but it is a way that works.
+Rather than incrementally improve this solution, I will look for a different, better solution.
+So this is probably as good as this write up gets.
