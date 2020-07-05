@@ -24,7 +24,8 @@ in {
             } ;
         } ;
     } ;
-    imports = [ ./hardware-configuration.nix ] ;
+    imports = [ <nixpkgs/nixos/modules/installer/cd-dvd/sd-image-raspberrypi4.nix> ] ;
+#    imports = [ ./hardware-configuration.nix ] ;
     networking = {
         interfaces = {
             eth0.useDHCP = true ;
@@ -32,9 +33,16 @@ in {
         } ;
         useDHCP = false ;
         wireless = {
-            enable = true ;
+            enable = false ;
+#            enable = true ;
             networks = import ./private/networks.nix ;
         } ;
+    } ;
+    services.xserver = {
+        enable = true ;
+        displayManager.lightdm.enable = true ;
+#        desktopManager.gnome3.enable = true ;
+        videoDrivers = [ "fbdev" ] ;
     } ;
     system.stateVersion = "20.03" ;
     users.users.user = {
