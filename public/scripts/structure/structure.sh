@@ -11,5 +11,9 @@ EOF
 	    ) &&
 	    true
     } &&
-    "${TIMERS}" "${NOW}" | while fun  &&
+    "${TIMERS}" "${NOW}" | while fun
+    do
+	echo fun &&
+	    true
+    done &&
     true
