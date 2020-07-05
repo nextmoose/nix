@@ -15,6 +15,7 @@
 		    fi
 	    '' ;
 	} ;
+	structure = name : constructor : options : derivations.structure name constructor options ;
 	upper-case = string : builtins.replaceStrings [ "a" "b" "c" "d" "e" "f" "g" "h" "i" "j" "k" "l" "m" "n" "o" "p" "q" "r" "s" "t" "u" "v" "w" "x" "y" "z" ] [ "A" "B" "C" "D" "E" "F" "G" "H" "I" "J" "K" "L" "M" "N" "O" "P" "Q" "R" "S" "T" "U" "V" "W" "X" "Y" "Z" ] string ;
     } ;
     derivations = utils.name-it {
@@ -22,6 +23,10 @@
 	post-commit = name : utils.sh-derivation name { remote = "origin" ; } [ pkgs.coreutils pkgs.git ] ;
 	rebuild-nixos = name : utils.sh-derivation name { uuid = "59aeb05f-ae75-49de-a085-850638700e95" ; } [ pkgs.coreutils pkgs.gnugrep pkgs.mktemp pkgs.rsync pkgs.systemd ] ;
 	standard-structure-dates = name : utils.sh-derivation name { } [ pkgs.coreutils ] ;
+	structure = name : constructor : { salt ? "{ pkgs.coreutils }/bin/true" , timers ? "${ derivations.standard-structure-date }/bin/standard-structure-dates" ,  destructor ? "${ pkgs.coreutils }/bin/true" } : utils.derivation name { constructor = constructor ; salt = salt ; timers = timers ; destructor = destructor ; } [ pkgs.coreutils ] ;
+    } ;
+    structures = utils.name-it {
+        foobar = name : utils.structure name "${ derivations.foobar }/bin/foobar" ;
     } ;
 in {
     boot = {
@@ -62,7 +67,14 @@ in {
         isNormalUser = true ;
         extraGroups = [ "wheel" ] ;
         passwordFile = "/etc/nixos/password.asc" ;
-        packages = [ pkgs.git derivations.rebuild-nixos pkgs.emacs derivations.foobar derivations.post-commit derivations.standard-structure-dates ] ;
+        packages = [
+	    pkgs.git
+	    derivations.rebuild-nixos
+	    pkgs.emacs
+	    derivations.foobar
+	    derivations.post-commit
+	    derivations.standard-structure-dates
+        ] ;
     } ;
 }
 
