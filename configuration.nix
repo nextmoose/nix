@@ -15,7 +15,7 @@
 		    fi
 	    '' ;
 	} ;
-	structure = name : constructor : options : derivations.structure name constructor options ;
+	structure = name : structures-dir : constructor : options : derivations.structure name structures-dir constructor options ;
 	upper-case = string : builtins.replaceStrings [ "a" "b" "c" "d" "e" "f" "g" "h" "i" "j" "k" "l" "m" "n" "o" "p" "q" "r" "s" "t" "u" "v" "w" "x" "y" "z" ] [ "A" "B" "C" "D" "E" "F" "G" "H" "I" "J" "K" "L" "M" "N" "O" "P" "Q" "R" "S" "T" "U" "V" "W" "X" "Y" "Z" ] string ;
     } ;
     derivations = utils.name-it {
@@ -23,10 +23,10 @@
 	post-commit = name : utils.sh-derivation name { remote = "origin" ; } [ pkgs.coreutils pkgs.git ] ;
 	rebuild-nixos = name : utils.sh-derivation name { uuid = "59aeb05f-ae75-49de-a085-850638700e95" ; } [ pkgs.coreutils pkgs.gnugrep pkgs.mktemp pkgs.rsync pkgs.systemd ] ;
 	structure-timers = name : utils.sh-derivation name { } [ pkgs.coreutils ] ;
-	structure = name : constructor : { salt ? "${ pkgs.coreutils }/bin/true" , timers ? "${ derivations.structure-timers }/bin/structure-timers" ,  destructor ? "${ pkgs.coreutils }/bin/true" } : utils.sh-derivation name { constructor = constructor ; salt = salt ; timers = timers ; destructor = destructor ; } [ pkgs.coreutils ] ;
+	structure = name : structures-dir : constructor : { salt ? "${ pkgs.coreutils }/bin/true" , timers ? "${ derivations.structure-timers }/bin/structure-timers" ,  destructor ? "${ pkgs.coreutils }/bin/true" } : utils.sh-derivation name { structures-dir = structures-dir ; constructor = constructor ; salt = salt ; timers = timers ; destructor = destructor ; } [ pkgs.coreutils ] ;
     } ;
-    structures = utils.name-it {
-        foobar = name : utils.structure name "${ derivations.foobar }/bin/foobar" ;
+    structures = structures-dir : utils.name-it {
+        foobar = name : utils.structure name structures-dir "${ derivations.foobar }/bin/foobar" ;
     } ;
 in {
     boot = {
@@ -56,11 +56,14 @@ in {
             networks = import ./private/networks.nix ;
         } ;
     } ;
-    services.xserver = {
-        enable = true ;
-        displayManager.lightdm.enable = true ;
-        desktopManager.lxqt.enable = true ;
-        videoDrivers = [ "fbdev" ] ;
+    services = {
+        atd.enable = true ;
+        xserver = {
+            enable = true ;
+            displayManager.lightdm.enable = true ;
+            desktopManager.lxqt.enable = true ;
+            videoDrivers = [ "fbdev" ] ;
+        } ;
     } ;
     system.stateVersion = "20.03" ;
     users.users.user = {
@@ -74,7 +77,7 @@ in {
 	    derivations.foobar
 	    derivations.post-commit
 	    derivations.structure-timers
-	    ( derivations.structure "${ pkgs.coreutils }/bin/true" { } )
+	    ( derivations.structure "/home/user/structures" "${ pkgs.coreutils }/bin/true" { } )
         ] ;
     } ;
 }
