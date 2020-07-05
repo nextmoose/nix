@@ -36,37 +36,6 @@ in {
             networks = import ./private/networks.nix ;
         } ;
     } ;
-#    nixpkgs.config.allowUnsupportedSystem = true ;
-#    nixpkgs.config.allowUnsupportedSystems = true ;
-    services.xserver = {
-        autorun = false ;
-        desktopManager.xterm.enable = true ;
-#        displayManager = {
-#            defaultSession = "none+i3" ;
-#            defaultSession = "none+awesome" ;
-#            defaultSession = "none+bspwm" ;
-#            defaultSession = "none+dwm" ;
-#            defaultSession = "none+evilwm" ;
-#            defaultSession = "none+exwm" ;
-#            sddm.enable = true ;
-#            gdm.enable = true ;
-#            lightdm.enable = true ;
-#        } ;
-#        enable = true ;
-#        layout = "us" ;
-#        windowManager.exwm.enable = true ;
-#        windowManager.evilwm.enable = true ;
-#        windowManager.dwm.enable = true ;
-#        windowManager.bspwm = {
-#            enable = true ;
-#        } ;
-#        windowManager.awesome = {
-#            enable = true ;
-#        } ;
-#        windowManager.i3 = {
-#            enable = true ;
-#        } ;
-    } ;
     system.stateVersion = "20.03" ;
     users.users.user = {
         isNormalUser = true ;
