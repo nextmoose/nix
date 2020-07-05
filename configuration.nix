@@ -11,16 +11,17 @@
 		    if [ -f $out/src/${ name }.sh ]
 		    then
 		        chmod 0500 $out/src/${ name }.sh &&
-		            makeWrapper $out/src/${ name }.sh $out/bin/${ name } ${ builtins.concatStringsSep " " ( builtins.map ( name : "--run \"export ${ name }=${ builtins.getAttr name sets } &&\"" ) ( builtins.attrNames sets ) ) } --set PATH "${ pkgs.lib.makeBinPath dependencies }"
+		            makeWrapper $out/src/${ name }.sh $out/bin/${ name } ${ builtins.concatStringsSep " " ( builtins.map ( name : "--run \"export ${ utils.upper-case name }=${ builtins.getAttr name sets } &&\"" ) ( builtins.attrNames sets ) ) } --set PATH "${ pkgs.lib.makeBinPath dependencies }"
 		    fi
 	    '' ;
 	} ;
-	upper-case = string : builtins.replace [ "a" "b" "c" "d" "e" "f" "g" "h" "i" "j" "k" "l" "m" "n" "o" "p" "q" "r" "s" "t" "u" "v" "w" "x" "y" "z" ] [ "A" "B" "C" "D" "E" "F" "G" "H" "I" "J" "K" "L" "M" "N" "O" "P" "Q" "R" "S" "T" "U" "V" "W" "X" "Y" "Z" ] string ;
+	upper-case = string : builtins.replaceStrings [ "a" "b" "c" "d" "e" "f" "g" "h" "i" "j" "k" "l" "m" "n" "o" "p" "q" "r" "s" "t" "u" "v" "w" "x" "y" "z" ] [ "A" "B" "C" "D" "E" "F" "G" "H" "I" "J" "K" "L" "M" "N" "O" "P" "Q" "R" "S" "T" "U" "V" "W" "X" "Y" "Z" ] string ;
     } ;
     derivations = utils.name-it {
         foobar = name : utils.sh-derivation name { uuid = "59aeb05f-ae75-49de-a085-850638700e95" ; } [ pkgs.coreutils ] ;
 	post-commit = name : utils.sh-derivation name { remote = "origin" ; } [ pkgs.coreutils pkgs.git ] ;
 	rebuild-nixos = name : utils.sh-derivation name { uuid = "59aeb05f-ae75-49de-a085-850638700e95" ; } [ pkgs.coreutils pkgs.gnugrep pkgs.mktemp pkgs.rsync pkgs.systemd ] ;
+	standard-structure-dates = name : utils.sh-derivation name { } [ pkgs.coreutils ] ;
     } ;
 in {
     boot = {
@@ -61,7 +62,7 @@ in {
         isNormalUser = true ;
         extraGroups = [ "wheel" ] ;
         passwordFile = "/etc/nixos/password.asc" ;
-        packages = [ pkgs.git derivations.rebuild-nixos pkgs.emacs derivations.foobar derivations.post-commit ] ;
+        packages = [ pkgs.git derivations.rebuild-nixos pkgs.emacs derivations.foobar derivations.post-commit derivations.standard-structure-dates ] ;
     } ;
 }
 
