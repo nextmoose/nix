@@ -1,4 +1,17 @@
 { config, pkgs, ... } : let
+    utils = {
+        script-derivation = name : sets : dependencies : pkgs.stdenv.mkDerivation {
+	    name = name ;
+	    src = ./public/scripts + ("/" + name) ;
+	    buildInputs = [ pkgs.coreutils pkgs.makeWrapper ] ;
+	    installPhase = ''
+	        mkdir $out &&
+		    cp --recursive . $out/src &&
+		    chmod 0500 $out/src/${ name }.sh &&
+		    makeWrapper $out/src/${ name }.sh $out/bin/${ name } --set PATH "${ pkgs.lib.makeBinPath dependencies }"
+	    '' ;
+	} ;
+    } ;
 rebuild-nixos = pkgs.stdenv.mkDerivation {
     name = "rebuild-nixos" ;
     src = ./public/scripts/rebuild-nixos ;
@@ -49,7 +62,7 @@ in {
         isNormalUser = true ;
         extraGroups = [ "wheel" ] ;
         passwordFile = "/etc/nixos/password.asc" ;
-        packages = [ pkgs.git rebuild-nixos pkgs.emacs ] ;
+        packages = [ pkgs.git rebuild-nixos pkgs.emacs ( utils.script-derivation "foobar" { } [ pkgs.coreutils ] ) ] ;
     } ;
 }
 
