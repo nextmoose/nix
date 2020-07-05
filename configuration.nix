@@ -1,16 +1,23 @@
 { config, pkgs, ... } : let
     utils = {
-        script-derivation = name : sets : dependencies : pkgs.stdenv.mkDerivation {
+        name-it = named : builtins.listToAttrs ( builtins.map ( name : { name = name ; value = builtins.getAttr name named name ; } ) ( builtins.attrNames named ) ) ;
+        sh-derivation = name : sets : dependencies : pkgs.stdenv.mkDerivation {
 	    name = name ;
 	    src = ./public/scripts + ("/" + name) ;
 	    buildInputs = [ pkgs.coreutils pkgs.makeWrapper ] ;
 	    installPhase = ''
 	        mkdir $out &&
 		    cp --recursive . $out/src &&
-		    chmod 0500 $out/src/${ name }.sh &&
-		    makeWrapper $out/src/${ name }.sh $out/bin/${ name } --set PATH "${ pkgs.lib.makeBinPath dependencies }"
+		    if [ -f $out/src/${ name }.sh ]
+		    then
+		        chmod 0500 $out/src/${ name }.sh &&
+		            makeWrapper $out/src/${ name }.sh $out/bin/${ name } --set PATH "${ pkgs.lib.makeBinPath dependencies }"
+		    fi
 	    '' ;
 	} ;
+    } ;
+    derivations = utils.name-it {
+        foobar = name : utils.sh-derivation name { } [ pkgs.coreutils ] ;
     } ;
 rebuild-nixos = pkgs.stdenv.mkDerivation {
     name = "rebuild-nixos" ;
@@ -62,7 +69,7 @@ in {
         isNormalUser = true ;
         extraGroups = [ "wheel" ] ;
         passwordFile = "/etc/nixos/password.asc" ;
-        packages = [ pkgs.git rebuild-nixos pkgs.emacs ( utils.script-derivation "foobar" { } [ pkgs.coreutils ] ) ] ;
+        packages = [ pkgs.git rebuild-nixos pkgs.emacs derivations.foobar ] ;
     } ;
 }
 
