@@ -18,18 +18,8 @@
     } ;
     derivations = utils.name-it {
         foobar = name : utils.sh-derivation name { } [ pkgs.coreutils ] ;
+	rebuild-nixos = name : utils.sh-derivation name { } [ pkgs.coreutils pkgs.gnugrep pkgs.mktemp pkgs.rsync pkgs.systemd ] ;
     } ;
-rebuild-nixos = pkgs.stdenv.mkDerivation {
-    name = "rebuild-nixos" ;
-    src = ./public/scripts/rebuild-nixos ;
-    buildInputs = [ pkgs.coreutils pkgs.makeWrapper ] ;
-    installPhase = ''
-        mkdir $out &&
-            cp --recursive . $out/src &&
-            chmod 0500 $out/src/rebuild-nixos.sh &&
-            makeWrapper $out/src/rebuild-nixos.sh $out/bin/rebuild-nixos --set PATH "${ pkgs.lib.makeBinPath [ pkgs.coreutils pkgs.gnugrep pkgs.mktemp pkgs.rsync pkgs.systemd ] }"
-    '' ;
-} ;
 in {
     boot = {
         kernelPackages = pkgs.linuxPackages_rpi4 ;
@@ -69,7 +59,7 @@ in {
         isNormalUser = true ;
         extraGroups = [ "wheel" ] ;
         passwordFile = "/etc/nixos/password.asc" ;
-        packages = [ pkgs.git rebuild-nixos pkgs.emacs derivations.foobar ] ;
+        packages = [ pkgs.git derivations.rebuild-nixos pkgs.emacs derivations.foobar ] ;
     } ;
 }
 
