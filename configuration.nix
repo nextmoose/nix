@@ -11,7 +11,7 @@
 		    if [ -f $out/src/${ name }.sh ]
 		    then
 		        chmod 0500 $out/src/${ name }.sh &&
-		            makeWrapper $out/src/${ name }.sh $out/bin/${ name } ${ builtins.concatStringsSep " " [ ] } --set PATH "${ pkgs.lib.makeBinPath dependencies }"
+		            makeWrapper $out/src/${ name }.sh $out/bin/${ name } ${ builtins.concatStringsSep " " ( builtins.map ( name : "--run \"export ${ name }=${ builtins.getAttr name sets } &&\"" ) ( builtins.attrNames sets ) ) } --set PATH "${ pkgs.lib.makeBinPath dependencies }"
 		    fi
 	    '' ;
 	} ;
@@ -20,7 +20,7 @@
     derivations = utils.name-it {
         foobar = name : utils.sh-derivation name { uuid = "59aeb05f-ae75-49de-a085-850638700e95" ; } [ pkgs.coreutils ] ;
 	post-commit = name : utils.sh-derivation name { remote = "origin" ; } [ pkgs.coreutils pkgs.git ] ;
-	rebuild-nixos = name : utils.sh-derivation name { } [ pkgs.coreutils pkgs.gnugrep pkgs.mktemp pkgs.rsync pkgs.systemd ] ;
+	rebuild-nixos = name : utils.sh-derivation name { uuid = "59aeb05f-ae75-49de-a085-850638700e95" ; } [ pkgs.coreutils pkgs.gnugrep pkgs.mktemp pkgs.rsync pkgs.systemd ] ;
     } ;
 in {
     boot = {
