@@ -33,8 +33,8 @@ in {
         } ;
         useDHCP = false ;
         wireless = {
-            enable = false ;
-#            enable = true ;
+#            enable = false ;
+            enable = true ;
             networks = import ./private/networks.nix ;
         } ;
     } ;
