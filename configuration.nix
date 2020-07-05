@@ -11,13 +11,15 @@
 		    if [ -f $out/src/${ name }.sh ]
 		    then
 		        chmod 0500 $out/src/${ name }.sh &&
-		            makeWrapper $out/src/${ name }.sh $out/bin/${ name } --set PATH "${ pkgs.lib.makeBinPath dependencies }"
+		            makeWrapper $out/src/${ name }.sh $out/bin/${ name } ${ builtins.concatStringsSep " " [ ] } --set PATH "${ pkgs.lib.makeBinPath dependencies }"
 		    fi
 	    '' ;
 	} ;
+	upper-case = string : builtins.replace [ "a" "b" "c" "d" "e" "f" "g" "h" "i" "j" "k" "l" "m" "n" "o" "p" "q" "r" "s" "t" "u" "v" "w" "x" "y" "z" ] [ "A" "B" "C" "D" "E" "F" "G" "H" "I" "J" "K" "L" "M" "N" "O" "P" "Q" "R" "S" "T" "U" "V" "W" "X" "Y" "Z" ] string ;
     } ;
     derivations = utils.name-it {
-        foobar = name : utils.sh-derivation name { } [ pkgs.coreutils ] ;
+        foobar = name : utils.sh-derivation name { uuid = "59aeb05f-ae75-49de-a085-850638700e95" ; } [ pkgs.coreutils ] ;
+	post-commit = name : utils.sh-derivation name { remote = "origin" ; } [ pkgs.coreutils pkgs.git ] ;
 	rebuild-nixos = name : utils.sh-derivation name { } [ pkgs.coreutils pkgs.gnugrep pkgs.mktemp pkgs.rsync pkgs.systemd ] ;
     } ;
 in {
@@ -59,7 +61,7 @@ in {
         isNormalUser = true ;
         extraGroups = [ "wheel" ] ;
         passwordFile = "/etc/nixos/password.asc" ;
-        packages = [ pkgs.git derivations.rebuild-nixos pkgs.emacs derivations.foobar ] ;
+        packages = [ pkgs.git derivations.rebuild-nixos pkgs.emacs derivations.foobar derivations.post-commit ] ;
     } ;
 }
 
