@@ -41,7 +41,7 @@ in {
     services.xserver = {
         enable = true ;
         displayManager.lightdm.enable = true ;
-#        desktopManager.gnome3.enable = true ;
+        desktopManager.lxqt.enable = true ;
         videoDrivers = [ "fbdev" ] ;
     } ;
     system.stateVersion = "20.03" ;
