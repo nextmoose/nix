@@ -49,7 +49,7 @@ in {
         isNormalUser = true ;
         extraGroups = [ "wheel" ] ;
         passwordFile = "/etc/nixos/password.asc" ;
-        packages = [ pkgs.git rebuild-nixos ] ;
+        packages = [ pkgs.git rebuild-nixos pkgs.emacs ] ;
     } ;
 }
 
