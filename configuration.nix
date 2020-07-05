@@ -22,8 +22,8 @@
         foobar = name : utils.sh-derivation name { uuid = "59aeb05f-ae75-49de-a085-850638700e95" ; } [ pkgs.coreutils ] ;
 	post-commit = name : utils.sh-derivation name { remote = "origin" ; } [ pkgs.coreutils pkgs.git ] ;
 	rebuild-nixos = name : utils.sh-derivation name { uuid = "59aeb05f-ae75-49de-a085-850638700e95" ; } [ pkgs.coreutils pkgs.gnugrep pkgs.mktemp pkgs.rsync pkgs.systemd ] ;
-	standard-structure-dates = name : utils.sh-derivation name { } [ pkgs.coreutils ] ;
-	structure = name : constructor : { salt ? "{ pkgs.coreutils }/bin/true" , timers ? "${ derivations.standard-structure-date }/bin/standard-structure-dates" ,  destructor ? "${ pkgs.coreutils }/bin/true" } : utils.derivation name { constructor = constructor ; salt = salt ; timers = timers ; destructor = destructor ; } [ pkgs.coreutils ] ;
+	structure-timers = name : utils.sh-derivation name { } [ pkgs.coreutils ] ;
+	structure = name : constructor : { salt ? "{ pkgs.coreutils }/bin/true" , timers ? "${ derivations.structure-timers }/bin/standard-structure-timers" ,  destructor ? "${ pkgs.coreutils }/bin/true" } : utils.sh-derivation name { constructor = constructor ; salt = salt ; timers = timers ; destructor = destructor ; } [ pkgs.coreutils ] ;
     } ;
     structures = utils.name-it {
         foobar = name : utils.structure name "${ derivations.foobar }/bin/foobar" ;
@@ -73,7 +73,8 @@ in {
 	    pkgs.emacs
 	    derivations.foobar
 	    derivations.post-commit
-	    derivations.standard-structure-dates
+	    derivations.structure-timers
+	    ( derivations.structure "${ pkgs.coreutils }/bin/true" { } )
         ] ;
     } ;
 }
