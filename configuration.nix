@@ -16,7 +16,7 @@
 	    '' ;
 	} ;
 	structure = structures-dir : constructor-program : options : derivations.structure structures-dir constructor-program "${ derivations.destructor structures-dir }/bin/destructor" options ;
-	upper-case = string : builtins.replaceStrings [ "a" "b" "c" "d" "e" "f" "g" "h" "i" "j" "k" "l" "m" "n" "o" "p" "q" "r" "s" "t" "u" "v" "w" "x" "y" "z" ] [ "A" "B" "C" "D" "E" "F" "G" "H" "I" "J" "K" "L" "M" "N" "O" "P" "Q" "R" "S" "T" "U" "V" "W" "X" "Y" "Z" ] string ;
+	upper-case = string : builtins.replaceStrings [ "-" "a" "b" "c" "d" "e" "f" "g" "h" "i" "j" "k" "l" "m" "n" "o" "p" "q" "r" "s" "t" "u" "v" "w" "x" "y" "z" ] [ "_" "A" "B" "C" "D" "E" "F" "G" "H" "I" "J" "K" "L" "M" "N" "O" "P" "Q" "R" "S" "T" "U" "V" "W" "X" "Y" "Z" ] string ;
     } ;
     derivations = utils.name-it {
         destructor = name : structures-dir : utils.sh-derivation name { structures-dir = structures-dir ; } [ pkgs.coreutils ] ;
