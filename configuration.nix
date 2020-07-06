@@ -19,12 +19,12 @@
 	upper-case = string : builtins.replaceStrings [ "-" "a" "b" "c" "d" "e" "f" "g" "h" "i" "j" "k" "l" "m" "n" "o" "p" "q" "r" "s" "t" "u" "v" "w" "x" "y" "z" ] [ "_" "A" "B" "C" "D" "E" "F" "G" "H" "I" "J" "K" "L" "M" "N" "O" "P" "Q" "R" "S" "T" "U" "V" "W" "X" "Y" "Z" ] string ;
     } ;
     derivations = utils.name-it {
-        destructor = name : structures-dir : utils.sh-derivation name { structures-dir = structures-dir ; } [ pkgs.coreutils ] ;
+        destructor = name : structures-dir : utils.sh-derivation name { structures-dir = structures-dir ; } [ pkgs.coreutils pkgs.utillinux ] ;
         foobar = name : utils.sh-derivation name { uuid = "59aeb05f-ae75-49de-a085-850638700e95" ; } [ pkgs.coreutils ] ;
 	post-commit = name : utils.sh-derivation name { remote = "origin" ; } [ pkgs.coreutils pkgs.git ] ;
 	rebuild-nixos = name : utils.sh-derivation name { uuid = "59aeb05f-ae75-49de-a085-850638700e95" ; } [ pkgs.coreutils pkgs.gnugrep pkgs.mktemp pkgs.rsync pkgs.systemd ] ;
 	structure-timers = name : utils.sh-derivation name { } [ pkgs.coreutils ] ;
-	structure = name : structures-dir : constructor-program : destructor-program : { salt-program ? "${ pkgs.coreutils }/bin/true" , timers-program ? "${ derivations.structure-timers }/bin/structure-timers" ,  cleaning-program ? "${ pkgs.coreutils }/bin/true" } : utils.sh-derivation name { structures-dir = structures-dir ; constructor-program = constructor-program ; salt-program = salt-program ; timers-program = timers-program ; cleaning-program = cleaning-program ; destructor-program = destructor-program ; } [ pkgs.coreutils ] ;
+	structure = name : structures-dir : constructor-program : destructor-program : { salt-program ? "${ pkgs.coreutils }/bin/true" , timers-program ? "${ derivations.structure-timers }/bin/structure-timers" ,  cleaning-program ? "${ pkgs.coreutils }/bin/true" } : utils.sh-derivation name { structures-dir = structures-dir ; constructor-program = constructor-program ; salt-program = salt-program ; timers-program = timers-program ; cleaning-program = cleaning-program ; destructor-program = destructor-program ; } [ pkgs.coreutils pkgs.utillinux ] ;
     } ;
     structures = structures-dir : {
         foobar = utils.structure structures-dir "${ derivations.foobar }/bin/foobar" { } ;
