@@ -28,7 +28,7 @@ NOW=$(mktemp -d) &&
 			flock --shared 202 || exit 1
 			WORK_DIR=$( mktemp -d "${STRUCTURES_DIR}/${HASH}.debug/XXXXXXXX" ) &&
 			    mkdir "${WORK_DIR}/${HASH}" &&
-			    cd "${WORK_DIR}/${HASH}.tmp" &&
+			    cd "${WORK_DIR}/${HASH}" &&
 			    BEFORE=$(date +%s) &&
 			    ( "${CONSTRUCTOR_PROGRAM}" > "${WORK_DIR}/${HASH}.log" 2> "${WORK_DIR}/${HASH}.err" || true ) &&
 			    EXIT_CODE="${?}" &&
