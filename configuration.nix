@@ -69,7 +69,7 @@ in {
     system.stateVersion = "20.03" ;
     users.users.user = {
         isNormalUser = true ;
-        extraGroups = [ "wheel" ] ;
+        extraGroups = [ "wheel" "atd" ] ;
         passwordFile = "/etc/nixos/password.asc" ;
         packages = [
 	    pkgs.git
