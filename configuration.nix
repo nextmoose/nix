@@ -58,7 +58,10 @@ in {
         } ;
     } ;
     services = {
-        atd.enable = true ;
+        atd = {
+	    allowEveryone = true ;
+	    enable = true ;
+	} ;
         xserver = {
             enable = true ;
             displayManager.lightdm.enable = true ;
