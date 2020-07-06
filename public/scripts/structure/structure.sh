@@ -48,6 +48,7 @@ EOF
 			    if [ "${EXIT_CODE}" == 0 ]
 			    then
 				D=$(date --date @${DESTRUCTION_TIMESTAMP} +"%H:%M %Y-%m-%d") &&
+				    which at &&
 				    echo "${DESTRUCTOR_PROGRAM} ${CLEANING_PROGRAM} ${HASH}" | at "${D}" &&
 				    mv "${WORK_DIR}/${HASH}" "${WORK_DIR}/${HASH}.log" "${WORK_DIR}/${HASH}.out" "${WORK_DIR}/${HASH}.err" "${STRUCTURES_DIR}" &&
 				    rm --recursive --force "${WORK_DIR}" &&
@@ -66,4 +67,4 @@ EOF
 	    ) 201> "${STRUCTURES_DIR}/${HASH}.lock" &&
 	    true
     } &&
-    "${TIMERS_PROGRAM}" | fun
+    "${TIMERS_PROGRAM}" "${NOW}" | fun
