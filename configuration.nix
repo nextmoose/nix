@@ -24,7 +24,7 @@
 	post-commit = name : utils.sh-derivation name { remote = "origin" ; } [ pkgs.coreutils pkgs.git ] ;
 	rebuild-nixos = name : utils.sh-derivation name { uuid = "59aeb05f-ae75-49de-a085-850638700e95" ; } [ pkgs.coreutils pkgs.gnugrep pkgs.mktemp pkgs.rsync pkgs.systemd ] ;
 	structure-timers = name : utils.sh-derivation name { } [ pkgs.coreutils ] ;
-	structure = name : structures-dir : constructor-program : destructor-program : { salt-program ? "${ pkgs.coreutils }/bin/true" , timers-program ? "${ derivations.structure-timers }/bin/structure-timers" ,  cleaning-program ? "${ pkgs.coreutils }/bin/true" } : utils.sh-derivation name { structures-dir = structures-dir ; constructor-program = constructor-program ; salt-program = salt-program ; timers-program = timers-program ; cleaning-program = cleaning-program ; destructor-program = destructor-program ; } [ pkgs.coreutils pkgs.utillinux ] ;
+	structure = name : structures-dir : constructor-program : destructor-program : { salt-program ? "${ pkgs.coreutils }/bin/true" , timers-program ? "${ derivations.structure-timers }/bin/structure-timers" ,  cleaning-program ? "${ pkgs.coreutils }/bin/true" } : utils.sh-derivation name { structures-dir = structures-dir ; constructor-program = constructor-program ; salt-program = salt-program ; timers-program = timers-program ; cleaning-program = cleaning-program ; destructor-program = destructor-program ; } [ pkgs.at pkgs.coreutils pkgs.utillinux ] ;
     } ;
     structures = structures-dir : {
         foobar = utils.structure structures-dir "${ derivations.foobar }/bin/foobar" { } ;
