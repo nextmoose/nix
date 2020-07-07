@@ -15,8 +15,8 @@ ${SALT}
 ${SCHEDULED_DESTRUCTION_TIME}
 EOF
 	    ) | md5sum | cut --bytes 1-32 ) &&
-#    (
-#	flock --shared 202 || exit 1
+    (
+	flock --shared 202 || exit 1
 	if [ -d "${STRUCTURES_DIR}/${HASH}" ]
 	then
 	    echo "NOW=${NOW}" >> "${STRUCTURES_DIR}/${HASH}.log" &&
@@ -73,5 +73,5 @@ EOF
 		true
 	fi &&
 	    true
-#    ) 202> "${STRUCTURES_DIR}/${HASH}.lock" &&
+    ) 202> "${STRUCTURES_DIR}/${HASH}.lock" &&
     true
