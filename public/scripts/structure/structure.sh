@@ -15,16 +15,16 @@ ${SALT}
 ${SCHEDULED_DESTRUCTION_TIME}
 EOF
 	    ) | md5sum | cut --bytes 1-32 ) &&
-    (
-	flock --shared 202 || exit 1
+#    (
+#	flock --shared 202 || exit 1
 	if [ -d "${STRUCTURES_DIR}/${HASH}" ]
 	then
 	    echo "NOW=${NOW}" >> "${STRUCTURES_DIR}/${HASH}.log" &&
 		echo "${STRUCTURES_DIR}/${HASH}" &&
 		true
 	else
-	    (
-		flock 203 || exit 1
+#	    (
+#		flock 203 || exit 1
 		if [ -d "${STRUCTURES_DIR}/${HASH}.debug" ]
 		then
 		    mkdir "${STRUCTURES_DIR}/${HASH}.debug" &&
@@ -50,13 +50,13 @@ EOF
 		    then
 			mv "${DEBUG_DIR}/${HASH}" "${DEBUG_DIR}/${HASH}.log" "${DEBUG_DIR}/${HASH}.out" "${DEBUG_DIR}/${HASH}.err" "${STRUCTURES_DIR}" &&
 			    ( cat <<EOF
-(
-flock --exclusive 204 || exit 1
+#(
+#flock --exclusive 204 || exit 1
 cd "${STRUCTURES_DIR}/${HASH}" &&
 "${CLEANER_PROGRAM}"  &&
 cd / &&
 rm --recursive --force "${STRUCTURES_DIR}/${HASH}" "${STRUCTURES_DIR}/${HASH}.log" "${STRUCTURES_DIR}/${HASH}.out" "${STRUCTURES_DIR}/${HASH}.err" "${STRUCTURES_DIR}/${HASH}.debug"
-) 204> ${STRUCTURES_DIR}/${HASH}.lock 
+#) 204> ${STRUCTURES_DIR}/${HASH}.lock 
 EOF
 			    ) | at "${SCHEDULED_DESTRUCTION_TIME}" &&
 			    echo "${STRUCTURES_DIR}/${HASH}" &&
@@ -67,9 +67,9 @@ EOF
 			    true
 		    fi &&
 		    true
-	    ) 203> "${STRUCTURES_DIR}/${HASH}.lock" &&
+#	    ) 203> "${STRUCTURES_DIR}/${HASH}.lock" &&
 		true
 	fi &&
 	    true
-    ) 202> "${STRUCTURES_DIR}/${HASH}.lock" &&
+#    ) 202> "${STRUCTURES_DIR}/${HASH}.lock" &&
     true
