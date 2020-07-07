@@ -55,7 +55,7 @@ cd / &&
 rm --recursive --force "${STRUCTURES_DIR}/${HASH}" "${STRUCTURES_DIR}/${HASH}.log" "${STRUCTURES_DIR}/${HASH}.out" "${STRUCTURES_DIR}/${HASH}.err" "${STRUCTURES_DIR}/${HASH}.debug"
 ) 204> ${STRUCTURES_DIR}/${HASH}.lock 
 EOF
-				) | at "${SCHEDULED_DESTRUCTION_TIME" &&
+				) | at "${SCHEDULED_DESTRUCTION_TIME}" &&
 				echo "${STRUCTURES_DIR}/${HASH}" &&
 				true
 			else
