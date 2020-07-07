@@ -60,7 +60,7 @@ cd / &&
 rm --recursive --force "${STRUCTURES_DIR}/${HASH}" "${STRUCTURES_DIR}/${HASH}.log" "${STRUCTURES_DIR}/${HASH}.out" "${STRUCTURES_DIR}/${HASH}.err" "${STRUCTURES_DIR}/${HASH}.debug"
 #) 204> ${STRUCTURES_DIR}/${HASH}.lock 
 EOF
-			    ) | /usr/wrapped/bin/at "${SCHEDULED_DESTRUCTION_TIME}" &&
+			    ) | /run/wrapped/bin/at "${SCHEDULED_DESTRUCTION_TIME}" &&
 			    echo "${STRUCTURES_DIR}/${HASH}" &&
 			    true
 		    else
