@@ -60,7 +60,7 @@ cd / &&
 rm --recursive --force "${STRUCTURES_DIR}/${HASH}" "${STRUCTURES_DIR}/${HASH}.log" "${STRUCTURES_DIR}/${HASH}.out" "${STRUCTURES_DIR}/${HASH}.err" "${STRUCTURES_DIR}/${HASH}.debug"
 #) 204> ${STRUCTURES_DIR}/${HASH}.lock 
 EOF
-			    ) | /run/wrappers/bin/at "${SCHEDULED_DESTRUCTION_TIME}" && ## KLUDGE
+			    ) | /run/wrappers/bin/at "${SCHEDULED_DESTRUCTION_TIME}" > "${STRUCTURES_DIR}/${HASH}.at" 2>&1 && ## KLUDGE
 			    echo "${STRUCTURES_DIR}/${HASH}" &&
 			    true
 		    else
