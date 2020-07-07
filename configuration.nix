@@ -11,11 +11,11 @@
 		    if [ -f $out/src/${ name }.sh ]
 		    then
 		        chmod 0500 $out/src/${ name }.sh &&
-		            makeWrapper $out/src/${ name }.sh $out/bin/${ name } ${ builtins.concatStringsSep " " ( builtins.map ( name : "--run \"export ${ utils.upper-case name }=${ builtins.getAttr name sets } &&\"" ) ( builtins.attrNames sets ) ) } --set PATH "${ pkgs.lib.makeBinPath dependencies }"
+		            makeWrapper $out/src/${ name }.sh $out/bin/${ name } ${ builtins.concatStringsSep " " ( builtins.map ( name : "--run \"export ${ utils.upper-case name }=${ builtins.toString ( builtins.getAttr name sets ) } &&\"" ) ( builtins.attrNames sets ) ) } --set PATH "${ pkgs.lib.makeBinPath dependencies }"
 		    fi
 	    '' ;
 	} ;
-	structure = structures-dir : constructor-program : options : derivations.structure structures-dir constructor-program "${ derivations.destructor structures-dir }/bin/destructor" options ;
+	structure = structures-dir : constructor-program : options : derivations.structure structures-dir constructor-program options ;
 	upper-case = string : builtins.replaceStrings [ "-" "a" "b" "c" "d" "e" "f" "g" "h" "i" "j" "k" "l" "m" "n" "o" "p" "q" "r" "s" "t" "u" "v" "w" "x" "y" "z" ] [ "_" "A" "B" "C" "D" "E" "F" "G" "H" "I" "J" "K" "L" "M" "N" "O" "P" "Q" "R" "S" "T" "U" "V" "W" "X" "Y" "Z" ] string ;
     } ;
     derivations = utils.name-it {
@@ -23,11 +23,10 @@
         foobar = name : utils.sh-derivation name { uuid = "59aeb05f-ae75-49de-a085-850638700e95" ; } [ pkgs.coreutils ] ;
 	post-commit = name : utils.sh-derivation name { remote = "origin" ; } [ pkgs.coreutils pkgs.git ] ;
 	rebuild-nixos = name : utils.sh-derivation name { uuid = "59aeb05f-ae75-49de-a085-850638700e95" ; } [ pkgs.coreutils pkgs.gnugrep pkgs.mktemp pkgs.rsync pkgs.systemd ] ;
-	structure-timers = name : utils.sh-derivation name { } [ pkgs.coreutils ] ;
-	structure = name : structures-dir : constructor-program : destructor-program : { salt-program ? "${ pkgs.coreutils }/bin/true" , timers-program ? "${ derivations.structure-timers }/bin/structure-timers" ,  cleaning-program ? "${ pkgs.coreutils }/bin/true" } : utils.sh-derivation name { structures-dir = structures-dir ; constructor-program = constructor-program ; salt-program = salt-program ; timers-program = timers-program ; cleaning-program = cleaning-program ; destructor-program = destructor-program ; } [ pkgs.which pkgs.at pkgs.coreutils pkgs.utillinux ] ;
+	structure = name : structures-dir : constructor-program : { cleaner-program ? "${ pkgs.coreutils }/bin/true" , salt-program ? "${ pkgs.coreutils }/bin/true" , seconds ? 60 * 60 } : utils.sh-derivation name { structures-dir = structures-dir ; constructor-program = constructor-program ; cleaner-program = cleaner-program ; salt-program = salt-program ; seconds = seconds ; } [ pkgs.coreutils ] ;
     } ;
     structures = structures-dir : {
-        foobar = utils.structure structures-dir "${ derivations.foobar }/bin/foobar" { } ;
+        foobar = utils.structure structures-dir "${ derivations.foobar }/bin/foobar" { cleaner-program = "${ pkgs.coreutils }/bin/true" ; salt-program = "${ pkgs.coreutils }/bin/true" ; seconds = 60 * 60 ; } ;
     } ;
 in {
     boot = {
@@ -80,7 +79,6 @@ in {
 	    pkgs.emacs
 	    derivations.foobar
 	    derivations.post-commit
-	    derivations.structure-timers
 	    ( ( structures "/home/user/structures" ).foobar )
         ] ;
     } ;
