@@ -57,7 +57,7 @@ EOF
 cd "${STRUCTURES_DIR}/${HASH}" &&
 "${CLEANER_PROGRAM}"  &&
 cd / &&
-rm --recursive --force "${STRUCTURES_DIR}/${HASH}" "${STRUCTURES_DIR}/${HASH}.log" "${STRUCTURES_DIR}/${HASH}.out" "${STRUCTURES_DIR}/${HASH}.err" "${STRUCTURES_DIR}/${HASH}.debug"
+rm --recursive --force "${STRUCTURES_DIR}/${HASH}" "${STRUCTURES_DIR}/${HASH}.log" "${STRUCTURES_DIR}/${HASH}.out" "${STRUCTURES_DIR}/${HASH}.err" "${STRUCTURES_DIR}/${HASH}.debug" "${STRUCTURES_DIR}/${HASH}.at
 #) 204> ${STRUCTURES_DIR}/${HASH}.lock 
 EOF
 			    ) | /run/wrappers/bin/at "${SCHEDULED_DESTRUCTION_TIME}" > "${STRUCTURES_DIR}/${HASH}.at" 2>&1 && ## KLUDGE
