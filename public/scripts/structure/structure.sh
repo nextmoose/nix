@@ -25,7 +25,7 @@ EOF
 	else
 #	    (
 #		flock 203 || exit 1
-		if [ -d "${STRUCTURES_DIR}/${HASH}.debug" ]
+		if [ ! -d "${STRUCTURES_DIR}/${HASH}.debug" ]
 		then
 		    mkdir "${STRUCTURES_DIR}/${HASH}.debug" &&
 			true
