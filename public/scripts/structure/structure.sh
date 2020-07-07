@@ -48,7 +48,8 @@ EOF
 		    ) &&
 		    if [ "${EXIT_CODE}" == 0 ]
 		    then
-			mv "${DEBUG_DIR}/${HASH}" "${DEBUG_DIR}/${HASH}.log" "${DEBUG_DIR}/${HASH}.out" "${DEBUG_DIR}/${HASH}.err" "${STRUCTURES_DIR}" &&
+			echo mv "${DEBUG_DIR}/${HASH}" "${DEBUG_DIR}/${HASH}.log" "${DEBUG_DIR}/${HASH}.out" "${DEBUG_DIR}/${HASH}.err" "${STRUCTURES_DIR}" &&
+			    mv "${DEBUG_DIR}/${HASH}" "${DEBUG_DIR}/${HASH}.log" "${DEBUG_DIR}/${HASH}.out" "${DEBUG_DIR}/${HASH}.err" "${STRUCTURES_DIR}" &&
 			    ( cat <<EOF
 #(
 #flock --exclusive 204 || exit 1
