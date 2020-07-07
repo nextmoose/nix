@@ -49,8 +49,7 @@ EOF
 		    ) &&
 		    if [ "${EXIT_CODE}" == 0 ]
 		    then
-			echo mv "${DEBUG_DIR}/${HASH}" "${DEBUG_DIR}/${HASH}.log" "${DEBUG_DIR}/${HASH}.out" "${DEBUG_DIR}/${HASH}.err" "${STRUCTURES_DIR}" &&
-			    mv "${DEBUG_DIR}/${HASH}" "${DEBUG_DIR}/${HASH}.log" "${DEBUG_DIR}/${HASH}.out" "${DEBUG_DIR}/${HASH}.err" "${STRUCTURES_DIR}" &&
+			mv "${DEBUG_DIR}/${HASH}" "${DEBUG_DIR}/${HASH}.log" "${DEBUG_DIR}/${HASH}.out" "${DEBUG_DIR}/${HASH}.err" "${STRUCTURES_DIR}" &&
 			    ( cat <<EOF
 #(
 #flock --exclusive 204 || exit 1
@@ -60,7 +59,7 @@ cd / &&
 rm --recursive --force "${STRUCTURES_DIR}/${HASH}" "${STRUCTURES_DIR}/${HASH}.log" "${STRUCTURES_DIR}/${HASH}.out" "${STRUCTURES_DIR}/${HASH}.err" "${STRUCTURES_DIR}/${HASH}.debug"
 #) 204> ${STRUCTURES_DIR}/${HASH}.lock 
 EOF
-			    ) | at "${SCHEDULED_DESTRUCTION_TIME}" &&
+			    ) && # | at "${SCHEDULED_DESTRUCTION_TIME}" &&
 			    echo "${STRUCTURES_DIR}/${HASH}" &&
 			    true
 		    else
