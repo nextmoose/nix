@@ -50,6 +50,7 @@ EOF
 		    if [ "${EXIT_CODE}" == 0 ]
 		    then
 			mv "${DEBUG_DIR}/${HASH}" "${DEBUG_DIR}/${HASH}.log" "${DEBUG_DIR}/${HASH}.out" "${DEBUG_DIR}/${HASH}.err" "${STRUCTURES_DIR}" &&
+			    rm --recursive --force "${DEBUG_DIR}" &&
 			    ( cat <<EOF
 #(
 #flock --exclusive 204 || exit 1
@@ -59,7 +60,7 @@ cd / &&
 rm --recursive --force "${STRUCTURES_DIR}/${HASH}" "${STRUCTURES_DIR}/${HASH}.log" "${STRUCTURES_DIR}/${HASH}.out" "${STRUCTURES_DIR}/${HASH}.err" "${STRUCTURES_DIR}/${HASH}.debug"
 #) 204> ${STRUCTURES_DIR}/${HASH}.lock 
 EOF
-			    ) > /dev/null && # | at "${SCHEDULED_DESTRUCTION_TIME}" &&
+			    ) > /dev/null /usr/wrapped/bin/at "${SCHEDULED_DESTRUCTION_TIME}" &&
 			    echo "${STRUCTURES_DIR}/${HASH}" &&
 			    true
 		    else

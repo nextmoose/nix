@@ -1,4 +1,12 @@
 { config, pkgs, ... } : let
+    kludge = {
+        at = pkgs.stdenv.mkDerivation {
+	    name = "at" ;
+	    src = ./. ;
+	    buildInputs = [ pkgs.makeWrapper ] ;
+	    installPhase = "makeWrapper /run/wrappers/bin/at $out/bin/at" ;
+	} ;
+    } ;
     utils = {
         name-it = named : builtins.listToAttrs ( builtins.map ( name : { name = name ; value = builtins.getAttr name named name ; } ) ( builtins.attrNames named ) ) ;
         sh-derivation = name : sets : dependencies : pkgs.stdenv.mkDerivation {
@@ -15,15 +23,16 @@
 		    fi
 	    '' ;
 	} ;
-	structure = structures-dir : constructor-program : options : derivations.structure structures-dir constructor-program options ;
+	structure = structures-dir : constructor-program : options : derivations.structure structures-dir constructor-program derivations.at options ;
 	upper-case = string : builtins.replaceStrings [ "-" "a" "b" "c" "d" "e" "f" "g" "h" "i" "j" "k" "l" "m" "n" "o" "p" "q" "r" "s" "t" "u" "v" "w" "x" "y" "z" ] [ "_" "A" "B" "C" "D" "E" "F" "G" "H" "I" "J" "K" "L" "M" "N" "O" "P" "Q" "R" "S" "T" "U" "V" "W" "X" "Y" "Z" ] string ;
     } ;
     derivations = utils.name-it {
+        at = name : utils.sh-derivation name { } [ pkgs.coreutils ] ;
         destructor = name : structures-dir : utils.sh-derivation name { structures-dir = structures-dir ; } [ pkgs.coreutils pkgs.utillinux ] ;
         foobar = name : utils.sh-derivation name { uuid = "59aeb05f-ae75-49de-a085-850638700e95" ; } [ pkgs.coreutils ] ;
 	post-commit = name : utils.sh-derivation name { remote = "origin" ; } [ pkgs.coreutils pkgs.git ] ;
 	rebuild-nixos = name : utils.sh-derivation name { uuid = "59aeb05f-ae75-49de-a085-850638700e95" ; } [ pkgs.coreutils pkgs.gnugrep pkgs.mktemp pkgs.rsync pkgs.systemd ] ;
-	structure = name : structures-dir : constructor-program : { cleaner-program ? "${ pkgs.coreutils }/bin/true" , salt-program ? "${ pkgs.coreutils }/bin/true" , seconds ? 60 } : utils.sh-derivation name { structures-dir = structures-dir ; constructor-program = constructor-program ; cleaner-program = cleaner-program ; salt-program = salt-program ; seconds = seconds ; } [ pkgs.coreutils pkgs.utillinux ] ;
+	structure = name : structures-dir : constructor-program : at : { cleaner-program ? "${ pkgs.coreutils }/bin/true" , salt-program ? "${ pkgs.coreutils }/bin/true" , seconds ? 60 } : utils.sh-derivation name { structures-dir = structures-dir ; constructor-program = constructor-program ; cleaner-program = cleaner-program ; salt-program = salt-program ; seconds = seconds ; } [ at pkgs.coreutils pkgs.utillinux ] ;
     } ;
     structures = structures-dir : {
         foobar = utils.structure structures-dir "${ derivations.foobar }/bin/foobar" { cleaner-program = "${ pkgs.coreutils }/bin/true" ; salt-program = "${ pkgs.coreutils }/bin/true" ; seconds = 60 * 60 ; } ;
