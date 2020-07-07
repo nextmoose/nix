@@ -66,9 +66,9 @@ EOF
 			true
 		fi &&
 		    true
-	    ) > "${STRUCTURES_DIR}/lock" &&
+	    ) 203> "${STRUCTURES_DIR}/lock" &&
 		true
 	fi &&
 	    true
-    ) > "${STRUCTURES_DIR}/${HASH}.lock" &&
+    ) 202> "${STRUCTURES_DIR}/${HASH}.lock" &&
     true
