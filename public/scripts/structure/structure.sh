@@ -7,7 +7,7 @@ NOW=$( date +%s ) &&
 	    true
     fi &&
     SALT=$( ${SALT_PROGRAM} ) &&
-    SCHEDULED_DESTRUCTION_TIME=$( date --date @$((((${NOW}+${SECONDS})/${SECONDS})*${SECONDS})) --date "%H:%M %Y-%m-%d" ) &&
+    SCHEDULED_DESTRUCTION_TIME=$( date --date @$((((${NOW}+${SECONDS})/${SECONDS})*${SECONDS})) "+%H:%M %Y-%m-%d" ) &&
     HASH=$( ( cat <<EOF
 ${CONSTRUCTOR_PROGRAM}
 ${CLEANER_PROGRAM}
