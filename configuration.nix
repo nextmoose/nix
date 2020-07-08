@@ -25,8 +25,7 @@
 		    if [ -f $out/src/${ name }.sh ]
 		    then
 		        chmod 0500 $out/src/${ name }.sh &&
-		            echo makeWrapper $out/src/${ name }.sh $out/bin/${ name } ${ builtins.concatStringsSep " " ( builtins.map ( name : ''--run export"${ upper-case name }=${ builtins.getAttr name s }"''  ) ( builtins.attrNames ( s ) ) ) }
-		            makeWrapper $out/src/${ name }.sh $out/bin/${ name } ${ builtins.concatStringsSep " " ( builtins.map ( name : ''--run export"${ upper-case name }=${ builtins.getAttr name s }"''  ) ( builtins.attrNames ( s ) ) ) }
+		            makeWrapper $out/src/${ name }.sh $out/bin/${ name } ${ builtins.concatStringsSep " " ( builtins.map ( name : "--run \"export ${ upper-case name }=${ builtins.getAttr name s }\""  ) ( builtins.attrNames ( s ) ) ) }
 		    fi
 	    '' ;
 	} ;
