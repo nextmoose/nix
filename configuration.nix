@@ -25,7 +25,6 @@
 		    if [ -f $out/src/${ name }.sh ]
 		    then
 		        chmod 0500 $out/src/${ name }.sh &&
-		            echo makeWrapper $out/src/${ name }.sh $out/bin/${ name } ${ builtins.concatStringsSep " " ( builtins.map ( name : "--run export \"${ upper-case name }=${ builtins.getAttr name s }\"" ) ( builtins.attrNames ( s ) ) ) } --set PATH "${ pkgs.lib.makeBinPath dependencies }"
 		            makeWrapper $out/src/${ name }.sh $out/bin/${ name } ${ builtins.concatStringsSep " " ( builtins.map ( name : "--run export \"${ upper-case name }=${ builtins.getAttr name s }\"" ) ( builtins.attrNames ( s ) ) ) } --run "export \"PATH=${ pkgs.lib.makeBinPath dependencies }\""
 		    fi
 	    '' ;
