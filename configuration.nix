@@ -12,7 +12,7 @@
         sh-derivation = name : sets : dependencies : let
 	    upper-case = string : builtins.replaceStrings [ "-" "a" "b" "c" "d" "e" "f" "g" "h" "i" "j" "k" "l" "m" "n" "o" "p" "q" "r" "s" "t" "u" "v" "w" "x" "y" "z" ] [ "_" "A" "B" "C" "D" "E" "F" "G" "H" "I" "J" "K" "L" "M" "N" "O" "P" "Q" "R" "S" "T" "U" "V" "W" "X" "Y" "Z" ] string ;
 	    s = sets {
-	        literal = value : "--run \"${ upper-case name }=${ builtins.toString value }\"" ;
+	        literal = value : "${ builtins.toString value }\"" ;
 	    } ;
 	in
 	pkgs.stdenv.mkDerivation {
@@ -25,7 +25,8 @@
 		    if [ -f $out/src/${ name }.sh ]
 		    then
 		        chmod 0500 $out/src/${ name }.sh &&
-		            makeWrapper $out/src/${ name }.sh $out/bin/${ name } ${ builtins.concatStringsSep " " ( builtins.map ( name : "--run \"${ upper-case name }=${ builtins.getAttr name s }\"" ) ( builtins.attrNames ( s ) ) ) } --set PATH "${ pkgs.lib.makeBinPath dependencies }"
+		            echo makeWrapper $out/src/${ name }.sh $out/bin/${ name } ${ builtins.concatStringsSep " " ( builtins.map ( name : "--run export \"${ upper-case name }=${ builtins.getAttr name s }\"" ) ( builtins.attrNames ( s ) ) ) } --set PATH "${ pkgs.lib.makeBinPath dependencies }"
+		            makeWrapper $out/src/${ name }.sh $out/bin/${ name } ${ builtins.concatStringsSep " " ( builtins.map ( name : "--run export \"${ upper-case name }=${ builtins.getAttr name s }\"" ) ( builtins.attrNames ( s ) ) ) } --run "export \"PATH=${ pkgs.lib.makeBinPath dependencies }\""
 		    fi
 	    '' ;
 	} ;
