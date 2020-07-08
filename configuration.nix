@@ -75,6 +75,7 @@ in {
 	    allowEveryone = true ;
 	    enable = true ;
 	} ;
+	sshd.enable = true ;
         xserver = {
             enable = true ;
             displayManager.lightdm.enable = true ;
