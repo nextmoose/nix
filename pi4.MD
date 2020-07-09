@@ -64,8 +64,8 @@ This is a documentation of the steps that I took.
 7. Create your password by `echo ${YOUR_PASSWORD} | mkpasswd --stdin -m sha-512 > password.asc`
 8. `cp --recursive configuration.nix public private password.asc /etc/nixos`
 9. `time nixos-rebuild build` -- takes about 21 minutes
-10. `time nixos-rebuild test` -- not long
-11. `time nixos-rebuild switch` -- not long
+10. `time nixos-rebuild test` -- not long ... about 2 minutes
+11. `time nixos-rebuild switch` -- not long ... about 2 minutes
 12. reboot
 13. You should get a gui.  You may need to manually start networking and sshd.
 
