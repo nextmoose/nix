@@ -6,5 +6,5 @@
 /run/wrappers/bin/sudo rsync --archive --delete --progress public /etc/nixos/ &&
 time /run/wrappers/bin/sudo /run/current-system/sw/bin/nixos-rebuild build &&
 time /run/wrappers/bin/sudo /run/current-system/sw/bin/nixos-rebuild test &&
-time /run/wrappers/bin/sudo /run/current-system/sw/bin/nixos-rebuild switch &&
+# time /run/wrappers/bin/sudo /run/current-system/sw/bin/nixos-rebuild switch &&
 true

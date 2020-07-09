@@ -89,6 +89,7 @@ in {
         extraGroups = [ "wheel" "atd" ] ;
         passwordFile = "/etc/nixos/password.asc" ;
         packages = [
+#	    pkgs.chromium
 	    pkgs.git
 	    derivations.rebuild-nixos
 	    pkgs.emacs
