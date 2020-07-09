@@ -19,6 +19,7 @@ This is a documentation of the steps that I took.
 8. a SD card
 
 ## Procedure
+### First Generation
 1. Hook up the pi to the keyboard and monitor.
 2. Download [the image](https://data.lunar.computer/nixos-sd-image-20.03pre206632.b0bbacb5213-aarch64-linux.img.bz2) to your computer.  Thank you [Lunar Computer](https://lunar.computer/about/) for providing the base image and for providing the base of these steps.  If I have seen farther than others, it is by standing on the shoulders of giants.
 3. Flash your SD card.  I put the card in the reader/writer and plug it into my computer and use this command `BEFORE=$(date +%s) && bunzip2 --stdout ~/Downloads/nixos-sd-image-20.03pre206632.b0bbacb5213-aarch64-linux.img.bz2 | sudo dd of=/dev/sda && AFTER=$(date +%s) && echo $(((${AFTER}-${BEFORE}+60)/60))`.  I do not use the time command because I believe that would pollute the image.
@@ -30,8 +31,8 @@ This is a documentation of the steps that I took.
 8. Execute `systemctl stop wpa_supplicant.service && wpa_supplicant -B -i wlan0 -c <(wpa_passphrase "${YOUR_WIFI_SSID}" "${YOUR_WIFI_PASSWORD}") && sleep 10s && ping -c 10 8.8.8.8` to get your wifi connectivity.
 9. I don't know if you need to execute this but do it anyway: `systemctl restart nix-daemon.service`.
 10. Execute `date --set "Sat 04 Jul 2020 09:51:16 AM EDT"`.  You can get the current date by executing `date` on your computer.
-11. Thanks to user [Gaelen](https://github.com/Gaelan) for this [helpful comment](https://github.com/NixOS/nixpkgs/issues/63720#issuecomment-628858247).  You need to execute as root `mkdir /boot && sudo mount /dev/mmcblk0p1 /boot && nixos-generate-config`.
-12. This will generate two files in the previously empty '/etc/nixos' directory.  You need to edit '/etc/nixos/configuration.nix' with these three things in mind.  You can edit the file by running `nixos-rebuild edit`
+11. Thanks to user [Gaelen](https://github.com/Gaelan) for this [helpful comment](https://github.com/NixOS/nixpkgs/issues/63720#issuecomment-628858247).  You need to execute as root `mkdir /boot && mount /dev/mmcblk0p1 /boot.
+12. Execute `nixos-generate-config`.  This will generate two files in the previously empty '/etc/nixos' directory.  You need to edit '/etc/nixos/configuration.nix' with these three things in mind.  You can edit the file by running `nixos-rebuild edit`
     1. boot loader
        1. boot.loader.grub.enable = false;
        2. boot.loader.raspberryPi.enable = true;
@@ -51,6 +52,40 @@ This is a documentation of the steps that I took.
 21. Log in as user and with ${YOUR_NEW_PASSWORD}.
 22. Execute `sudo su --login` to get full root powers.
 23. Execute `systemctl stop wpa_supplicant.service && wpa_supplicant -B -i wlan0 -c <(wpa_passphrase "${YOUR_WIFI_SSID}" "${YOUR_WIFI_PASSWORD}") && sleep 10s && ping -c 10 8.8.8.8` to start wifi.
+
+
+### Second Generation
+1. Follow First Generation steps 1-11.
+2. Execute `nix-env -ia nixos.git` to install git.
+3. Use git to clone configuration `cd $(mktemp -d) && git clone https://github.com/nextmoose/nix.git`.  Use my configuration if you wish or substitute another url to get another configuration.  The rest of the instructions assume you use my configuration.
+4. `cd nix`
+5. `mkdir private`
+6. Create 'private/networks.nix' to look like `{ "${YOUR_WIFI_SSID}" = { psk = "${YOUR_WIFI_PASSWORD}" ; } }`
+7. Create your password by `echo ${YOUR_PASSWORD} | mkpasswd --stdin -m sha-512 > password.asc`
+8. `cp --recursive configuration.nix public private password.asc /etc/nixos`
+9. `time nixos-rebuild build` -- takes about 21 minutes
+10. `time nixos-rebuild test` -- not long
+11. `time nixos-rebuild switch` -- not long
+12. reboot
+13. You should get a gui.  You may need to manually start networking and sshd.
+
+The advantage of the second generation is that it cuts out steps.  Rather than build and install a vanilla configuration and then build and install a custom configuration just build and install the custom configuration.
+
+### Third Generation
+1. One time:
+   1. Follow the first or second generation.
+   2. Power down the pi.
+   3. Put the SD card in the reader and plug it in your computer.
+   4. Execute `dd if=/dev/sda of=~/custom.img` ... Copy the image to a file.  This should take about 20 minutes.
+2. When needed:
+   1. Put the card in the computer's reader and execute `dd if=~/custom.img of=/dev/sda`.  This should take about 20 minutes.
+   2. Safely remove the card.
+   3. Put the card in the pi and boot.
+
+### Fourth Generation
+Like 3rd generation but use nixos to generate the image.
+
+
 
 ## Discussion
 This is perhaps an overly prescriptive summary of the steps I took to put nixos on my Raspberry Pi 4 card.
