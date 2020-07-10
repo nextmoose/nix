@@ -12,7 +12,7 @@
         sh-derivation = name : sets : dependencies : let
 	    upper-case = string : builtins.replaceStrings [ "-" "a" "b" "c" "d" "e" "f" "g" "h" "i" "j" "k" "l" "m" "n" "o" "p" "q" "r" "s" "t" "u" "v" "w" "x" "y" "z" ] [ "_" "A" "B" "C" "D" "E" "F" "G" "H" "I" "J" "K" "L" "M" "N" "O" "P" "Q" "R" "S" "T" "U" "V" "W" "X" "Y" "Z" ] string ;
 	    s = sets {
-	        literal = value : "${ builtins.toString value }" ;
+	        literal = name : value : "--run \"export ${ upper-case name}=${ builtins.replaceStrings [ "\"" ] [ "\\\"" ] ( builtins.toString value ) }\"" ;
 	    } ;
 	in
 	pkgs.stdenv.mkDerivation {
@@ -25,19 +25,19 @@
 		    if [ -f $out/src/${ name }.sh ]
 		    then
 		        chmod 0500 $out/src/${ name }.sh &&
-		            makeWrapper $out/src/${ name }.sh $out/bin/${ name } ${ builtins.concatStringsSep " " ( builtins.map ( name : "--run \"export ${ upper-case name }=${ builtins.getAttr name s }\""  ) ( builtins.attrNames ( s ) ) ) }
+			    makeWrapper $out/src/${ name }.sh $out/bin/${ name } ${ builtins.concatStringsSep " " s }
 		    fi
 	    '' ;
 	} ;
 	structure = structures-dir : constructor-program : options : derivations.structure structures-dir constructor-program derivations.at options ;
     } ;
     derivations = utils.name-it {
-        at = name : utils.sh-derivation name ( setters : { } ) [ pkgs.coreutils ] ;
-        destructor = name : structures-dir : utils.sh-derivation name ( setters : { structures-dir = setters.literal structures-dir ; } ) [ pkgs.coreutils pkgs.utillinux ] ;
-        foobar = name : utils.sh-derivation name ( setters : { uuid = setters.literal "59aeb05f-ae75-49de-a085-850638700e95" ; } ) [ pkgs.coreutils ] ;
-	post-commit = name : utils.sh-derivation name ( setters : { remote = setters.literal "origin" ; } ) [ pkgs.coreutils pkgs.git ] ;
-	rebuild-nixos = name : utils.sh-derivation name ( setters : { uuid = setters.literal "59aeb05f-ae75-49de-a085-850638700e95" ; } ) [ pkgs.coreutils pkgs.gnugrep pkgs.mktemp pkgs.rsync pkgs.systemd ] ;
-	structure = name : structures-dir : constructor-program : at : { cleaner-program ? "${ pkgs.coreutils }/bin/true" , salt-program ? "${ pkgs.coreutils }/bin/true" , seconds ? 60 } : utils.sh-derivation name ( setters : { structures-dir = setters.literal structures-dir ; constructor-program = setters.literal constructor-program ; cleaner-program = setters.literal cleaner-program ; salt-program = setters.literal salt-program ; seconds = setters.literal seconds ; } ) [ at pkgs.coreutils pkgs.utillinux ] ;
+        at = name : utils.sh-derivation name ( setters : [ ] ) [ pkgs.coreutils ] ;
+        destructor = name : structures-dir : utils.sh-derivation name ( setters :  [ ( setters.literal "STRUCTURES_DIR" structures-dir ) ] ) [ pkgs.coreutils pkgs.utillinux ] ;
+        foobar = name : utils.sh-derivation name ( setters : [ ( setters.literal "UUID" "59aeb05f-ae75-49de-a085-850638700e95" ) ] ) [ pkgs.coreutils ] ;
+	post-commit = name : utils.sh-derivation name ( setters : [ ( setters.literal "REMOTE" "origin" ) ] ) [ pkgs.coreutils pkgs.git ] ;
+	rebuild-nixos = name : utils.sh-derivation name ( setters : [ ( setters.literal "UUID" "59aeb05f-ae75-49de-a085-850638700e95" ) ] ) [ pkgs.coreutils pkgs.gnugrep pkgs.mktemp pkgs.rsync pkgs.systemd ] ;
+	structure = name : structures-dir : constructor-program : at : { cleaner-program ? "${ pkgs.coreutils }/bin/true" , salt-program ? "${ pkgs.coreutils }/bin/true" , seconds ? 60 } : utils.sh-derivation name ( setters : [ ( setters.literal "STRUCTURES_DIR" structures-dir ) ( setters.literal "CONSTRUCTORS_PROGRAM" constructor-program ) ( setters.literal "CLEANER_PROGRAM" cleaner-program ) ( setters.literal "SALT_PROGRAM" salt-program ) ( setters.literal "SECONDS" seconds ) ] ) [ at pkgs.coreutils pkgs.utillinux ] ;
     } ;
     structures = structures-dir : {
         foobar = utils.structure structures-dir "${ derivations.foobar }/bin/foobar" { cleaner-program = "${ pkgs.coreutils }/bin/true" ; salt-program = "${ pkgs.coreutils }/bin/true" ; seconds = 60 * 60 ; } ;
