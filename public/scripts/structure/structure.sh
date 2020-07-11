@@ -74,7 +74,7 @@ EOF
 				true
 			fi &&
 			true
-		) > "${STRUCTURES_DIR}/${HASH}.exclusive" &&
+		) 202> "${STRUCTURES_DIR}/${HASH}.exclusive" &&
 		    true
 	    fi &&
 	    true
