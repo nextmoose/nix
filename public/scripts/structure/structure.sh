@@ -48,28 +48,7 @@ EOF
 			if [ "${EXIT_CODE}" == 0 ]
 			then
 			    cd "${STRUCTURES_DIR}" &&
-				( cat <<EOF
-echo BEFORE 201 >> ${STRUCTURES_DIR}/at.log &&
-(
-    ( flock 201 || exit 1 ) &&
-        echo BEFORE 202 >> ${STRUCTURES_DIR}/at.log &&
-        (
-            ( flock --exclusive 202 || exit 1 ) &&
-                cd "${STRUCTURES_DIR}/${HASH}" &&
-		"${CLEANER_PROGRAM}" &&
-		cd "${STRUCTURES_DIR}" &&
-		rm --recursive --force "${STRUCTURES_DIR}/${HASH}" "${STRUCTURES_DIR}/${HASH}.log" "${STRUCTURES_DIR}/${HASH}.out" "${STRUCTURES_DIR}/${HASH}.err" "${STRUCTURES_DIR}/${HASH}.debug" "${STRUCTURES_DIR}/${HASH}.at" &&
-                true
-        ) 202> "${STRUCTURES_DIR}/${HASH}.exclusive &&
-	echo AFTER 202 >> ${STRUCTURES_DIR}/at.log &&
-	    rm "${STRUCTURES_DIR}/${HASH}.exclusive &&
-            true
-) 201> "${STRUCTURES_DIR}/${HASH}.shared &&
-    echo AFTER 201 >> ${STRUCTURES_DIR}/at.log &&
-    rm "${STRUCTURES_DIR}/${HASH}.shared &&
-    true
-EOF
-				) | at $( date --date "@${SCHEDULED_DESTRUCTION_TIME}" "+%H:%M %Y-%m-%d" ) > "${DEBUG_DIR}/${HASH}.at" 2>&1 &&
+				echo "${DESTRUCTOR_PROGRAM} ${CLEANER_PROGRAM} ${HASH}" | at $( date --date "@${SCHEDULED_DESTRUCTION_TIME}" "+%H:%M %Y-%m-%d" ) > "${DEBUG_DIR}/${HASH}.at" 2>&1 &&
 			        mv "${DEBUG_DIR}/${HASH}" "${DEBUG_DIR}/${HASH}.log" "${DEBUG_DIR}/${HASH}.out" "${DEBUG_DIR}/${HASH}.err" "${DEBUG_DIR}/${HASH}.at" "${STRUCTURES_DIR}" &&
 				echo "${STRUCTURES_DIR}/${HASH}" &&
 				true

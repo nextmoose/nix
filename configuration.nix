@@ -17,16 +17,17 @@
 		    fi
 	    '' ;
 	} ;
-	structure = structures-dir : constructor-program : options : derivations.structure structures-dir constructor-program derivations.at options ;
+	structure = structures-dir : constructor-program : options : derivations.structure structures-dir constructor-program derivations.destructor derivations.at options ;
 	upper-case = string : builtins.replaceStrings [ "-" "a" "b" "c" "d" "e" "f" "g" "h" "i" "j" "k" "l" "m" "n" "o" "p" "q" "r" "s" "t" "u" "v" "w" "x" "y" "z" ] [ "_" "A" "B" "C" "D" "E" "F" "G" "H" "I" "J" "K" "L" "M" "N" "O" "P" "Q" "R" "S" "T" "U" "V" "W" "X" "Y" "Z" ] string ;
     } ;
     derivations = utils.name-it {
         at = name : utils.sh-derivation name { } [ pkgs.coreutils ] ;
+	destructor = name : utils.sh-derivation name { } [ pkgs.coreutils ] ;
         foo = name : uuid : utils.sh-derivation name { uuid = uuid ; } [ pkgs.coreutils ] ;
 	foobar = name : foo : utils.sh-derivation name { foo = foo ; } [ pkgs.coreutils ] ;
 	post-commit = name : remote : utils.sh-derivation name { remote = remote ; } [ pkgs.coreutils pkgs.git ] ;
 	rebuild-nixos = name : utils.sh-derivation name { } [ pkgs.coreutils pkgs.gnugrep pkgs.mktemp pkgs.rsync pkgs.systemd ] ;
-	structure = name : structures-dir : constructor-program : at : { cleaner-program ? "${ pkgs.coreutils }/bin/true" , salt-program ? "${ pkgs.coreutils }/bin/true" , seconds ? 60 * 60 } : utils.sh-derivation name { structures-dir = literal structures-dir ; constructor-program = literal constructor-program ; cleaner-program = literal cleaner-program ; salt-program = literal salt-program ; seconds = literal seconds ; } [ at pkgs.coreutils pkgs.utillinux ] ;
+	structure = name : structures-dir : constructor-program : destructor : at : { cleaner-program ? "${ pkgs.coreutils }/bin/true" , salt-program ? "${ pkgs.coreutils }/bin/true" , seconds ? 60 * 60 } : utils.sh-derivation name { structures-dir = literal structures-dir ; constructor-program = literal constructor-program ; cleaner-program = literal cleaner-program ; salt-program = literal salt-program ; seconds = literal seconds ; destructor-program = literal "${ destructor }/bin/destructor" ; } [ at pkgs.coreutils pkgs.utillinux ] ;
     } ;
     structures = structures-dir : {
         foo = uuid : utils.structure structures-dir "${ derivations.foo uuid }/bin/foo" { seconds = 60 ; } ;
