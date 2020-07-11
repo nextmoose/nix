@@ -43,6 +43,7 @@ CLEANER_PROGRAM=${CLEANER_PROGRAM}
 SALT=${SALT}
 SCHEDULE_DESTRUCTION_TIME=${SCHEDULED_DESTRUCTION_TIME}
 ELAPSED_CONSTRUCTION_TIME=$(( ${AFTER} -  ${BEFORE} ))
+EXIT_CODE=${EXIT_CODE}
 EOF
 			) &&
 			if [ "${EXIT_CODE}" == 0 ]
@@ -55,6 +56,7 @@ EOF
 			else
 			    "${CLEANER_PROGRAM}" &&
 				echo "${DEBUG_DIR}/${HASH}" &&
+				echo "${EXIT_CODE}" &&
 				true
 			fi &&
 			true
