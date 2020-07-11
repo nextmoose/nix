@@ -46,7 +46,7 @@ EOF
 			) &&
 			if [ "${EXIT_CODE}" == 0 ]
 			then
-			    cd "${STRUCTURES_DIR" &&
+			    cd "${STRUCTURES_DIR}" &&
 			        mv "${DEBUG_DIR}/${HASH}" "${DEBUG_DIR}/${HASH}.log" "${DEBUG_DIR}/${HASH}.out" "${DEBUG_DIR}/${HASH}.err" "${STRUCTURES_DIR}" &&
 				( cat <<EOF
 (
