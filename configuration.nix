@@ -23,6 +23,18 @@
     derivations = utils.name-it {
         at = name : utils.sh-derivation name { } [ pkgs.coreutils ] ;
 	destructor = name : utils.sh-derivation name { } [ pkgs.coreutils ] ;
+	dot-gnupg = name : gpg-private-keys : gpg-ownertrust : gpg2-private-keys : gpg2-ownertrust : utils.sh-derivation name { gpg-private-keys = gpg-private-keys ; gpg-ownertrust = gpg-ownertrust ; gpg2-private-keys = gpg2-private-keys ; gpg2-ownertrust = gpg2-ownertrust ; } [ pkgs.gnupg ] ;
+	fetchFromGithub = name : owner : repo : rev : sha256 : pkgs.stdenv.mkDerivation {
+	    name = name ;
+	    src = pkgs.fetchFromGithub {
+	        owner = owner ;
+		repo = repo ;
+		rev = rev ;
+		sha256 = sha256 ;
+	    } ;
+	    buildInputs = [ pkgs.coreutils ] ;
+	    installPhase = "cp --recursive . $out" ;
+	} ;
         foo = name : uuid : utils.sh-derivation name { uuid = uuid ; } [ pkgs.coreutils ] ;
 	foobar = name : foo : utils.sh-derivation name { foo = foo ; } [ pkgs.coreutils ] ;
 	post-commit = name : remote : utils.sh-derivation name { remote = remote ; } [ pkgs.coreutils pkgs.git ] ;
@@ -30,6 +42,7 @@
 	structure = name : structures-dir : constructor-program : destructor : at : { cleaner-program ? "${ pkgs.coreutils }/bin/true" , salt-program ? "${ pkgs.coreutils }/bin/true" , seconds ? 60 * 60 } : utils.sh-derivation name { structures-dir = literal structures-dir ; constructor-program = literal constructor-program ; cleaner-program = literal cleaner-program ; salt-program = literal salt-program ; seconds = literal seconds ; destructor-program = literal "${ destructor }/bin/destructor" ; } [ at pkgs.coreutils pkgs.utillinux ] ;
     } ;
     structures = structures-dir : {
+        dot-gnupg = gpg-private-keys : gpg-ownertrust : gpg2-private-keys : gpg2-ownertrust : utils.structure structures-dir "${ derivations.dot-gnupg gpg-private-keys gpg-ownertrust gpg2-private-keys gpg2-ownertrust }/bin/dot-gnupg" { seconds = 121 ; } ;
         foo = uuid : utils.structure structures-dir "${ derivations.foo uuid }/bin/foo" { seconds = 121 ; } ;
     } ;
 in {
@@ -85,7 +98,8 @@ in {
 	    ( derivations.foo ( literal "b59c8073-29be-4425-966c-e215101e3448" ) )
 	    ( derivations.foobar ( structure-dir ( ( structures"/home/user/structures" ).foo ( literal "b2b48732-9547-4e14-bb8f-31fed11cc8d6" ) ) ) )
 	    ( derivations.post-commit ( literal "origin" ) )
-	    ( ( structures "/home/user/structures" ).foo ( literal "59dab5e4-85d1-4480-9aed-abd45142d92e" ) )
+#	    ( ( structures "/home/user/structures" ).foo ( literal "59dab5e4-85d1-4480-9aed-abd45142d92e" ) )
+	    ( ( structures "/home/user/structures" ).dot-gnupg ( literal ./private/gpg-private-keys.asc ) ( literal ./private/gpg-ownertrust.asc ) ( literal ./private/gpg2-private-keys.asc ) ( literal ./private/gpg2-ownertrust.asc ) )
         ] ;
     } ;
 }
