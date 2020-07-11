@@ -7,7 +7,7 @@ NOW=$( date +%s ) &&
 	    true
     fi &&
     SALT="$( ${SALT_PROGRAM} )" &&
-    SCHEDULED_DESTRUCTION_TIME=$( date --date $(( ( ( $( date +%s ) + ${SECONDS} ) / ${SECONDS} ) * ${SECONDS} )) +%s ) &&
+    SCHEDULED_DESTRUCTION_TIME=$( date --date @$(( ( ( $( date +%s ) + ${SECONDS} ) / ${SECONDS} ) * ${SECONDS} )) +%s ) &&
     HASH=$( ( cat <<EOF
 ${CONSTRUCTOR_PROGRAM}
 ${CLEANER_PROGRAM}
@@ -65,7 +65,7 @@ EOF
     rm "${STRUCTURES_DIR}/${HASH}.shared &&
     true
 EOF
-				) | at $( date --date "${SCHEDULED_DESTRUCTION_TIME}" "+%Y-%m-%d %H:%M" ) &&
+				) | at $( date --date "@${SCHEDULED_DESTRUCTION_TIME}" "+%Y-%m-%d %H:%M" ) &&
 				echo "${STRUCTURES_DIR}/${HASH}" &&
 				true
 			else
