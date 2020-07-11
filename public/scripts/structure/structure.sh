@@ -80,8 +80,10 @@ EOF
 			fi &&
 			true
 		) 202> "${STRUCTURES_DIR}/${HASH}.exclusive" &&
+		    echo "RELEASED 202 LOCK" >> ${STRUCTURES_DIR}/at.log &&
 		    true
 	    fi &&
 	    true
     ) 201> "${STRUCTURES_DIR}/${HASH}.shared" &&
+    echo "RELEASED 201 LOCK" >> ${STRUCTURES_DIR}/at.log &&
     true
