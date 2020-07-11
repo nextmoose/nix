@@ -61,9 +61,11 @@ echo BEFORE 201 >> ${STRUCTURES_DIR}/at.log &&
 		rm --recursive --force "${STRUCTURES_DIR}/${HASH}" "${STRUCTURES_DIR}/${HASH}.log" "${STRUCTURES_DIR}/${HASH}.out" "${STRUCTURES_DIR}/${HASH}.err" "${STRUCTURES_DIR}/${HASH}.debug" "${STRUCTURES_DIR}/${HASH}.at" &&
                 true
         ) 202> "${STRUCTURES_DIR}/${HASH}.exclusive &&
+	echo AFTER 202 >> ${STRUCTURES_DIR}/at.log &&
 	    rm "${STRUCTURES_DIR}/${HASH}.exclusive &&
             true
 ) 201> "${STRUCTURES_DIR}/${HASH}.shared &&
+    echo AFTER 201 >> ${STRUCTURES_DIR}/at.log &&
     rm "${STRUCTURES_DIR}/${HASH}.shared &&
     true
 EOF
