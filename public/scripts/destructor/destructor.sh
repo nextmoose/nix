@@ -1,7 +1,8 @@
 #!/bin/sh
 
 CLEANER_PROGRAM="${1}" &&
-    HASH="${2}" &&
+    STRUCTURES_DIR="${2}" &&
+    HASH="${3}" &&
     (
 	( flock 201 || exit 1 ) &&
 	    (
