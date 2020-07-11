@@ -31,7 +31,8 @@ EOF
 				true
 			fi &&
 			DEBUG_DIR=$( mktemp -d "${STRUCTURES_DIR}/${HASH}.debug/XXXXXXXX" ) &&
-			cd "${DEBUG_DIR}" &&
+			mkdir "${DEBUG_DIR}/${HASH}" &&
+			cd "${DEBUG_DIR}/${HASH}" &&
 			BEFORE=$( date +%s ) &&
 			( "${CONSTRUCTOR_PROGRAM}" > "${DEBUG_DIR}/${HASH}.out" 2> "${DEBUG_DIR}/${HASH}.err" || true ) &&
 			EXIT_CODE="${?}" &&
