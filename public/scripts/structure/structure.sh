@@ -49,7 +49,8 @@ EOF
 			if [ "${EXIT_CODE}" == 0 ]
 			then
 			    cd "${STRUCTURES_DIR}" &&
-				echo "${DESTRUCTOR_PROGRAM} ${CLEANER_PROGRAM} ${STRUCTURES_DIR} ${HASH}" | at $( date --date "@${SCHEDULED_DESTRUCTION_TIME}" "+%H:%M %Y-%m-%d" ) > "${DEBUG_DIR}/${HASH}.at" 2>&1 &&
+				# KLUDGE -- WTF AT
+				echo "${DESTRUCTOR_PROGRAM} ${CLEANER_PROGRAM} ${STRUCTURES_DIR} ${HASH}" | /run/wrappers/bin/at $( date --date "@${SCHEDULED_DESTRUCTION_TIME}" "+%H:%M %Y-%m-%d" ) > "${DEBUG_DIR}/${HASH}.at" 2>&1 &&
 			        mv "${DEBUG_DIR}/${HASH}" "${DEBUG_DIR}/${HASH}.log" "${DEBUG_DIR}/${HASH}.out" "${DEBUG_DIR}/${HASH}.err" "${DEBUG_DIR}/${HASH}.at" "${STRUCTURES_DIR}" &&
 				echo "${STRUCTURES_DIR}/${HASH}" &&
 				true
