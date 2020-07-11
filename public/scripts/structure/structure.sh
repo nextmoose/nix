@@ -48,7 +48,6 @@ EOF
 			if [ "${EXIT_CODE}" == 0 ]
 			then
 			    cd "${STRUCTURES_DIR}" &&
-			        mv "${DEBUG_DIR}/${HASH}" "${DEBUG_DIR}/${HASH}.log" "${DEBUG_DIR}/${HASH}.out" "${DEBUG_DIR}/${HASH}.err" "${STRUCTURES_DIR}" &&
 				( cat <<EOF
 (
     ( flock 201 || exit 1 ) &&
@@ -66,7 +65,8 @@ EOF
     rm "${STRUCTURES_DIR}/${HASH}.shared &&
     true
 EOF
-				) | at $( date --date "@${SCHEDULED_DESTRUCTION_TIME}" "+%H:%M %Y-%m-%d" ) &&
+				) | at $( date --date "@${SCHEDULED_DESTRUCTION_TIME}" "+%H:%M %Y-%m-%d" ) > "${DEBUG_DIR}/${HASH}.at" 2>&1 &&
+			        mv "${DEBUG_DIR}/${HASH}" "${DEBUG_DIR}/${HASH}.log" "${DEBUG_DIR}/${HASH}.out" "${DEBUG_DIR}/${HASH}.err" "${DEBUG_DIR}/${HASH}.at" "${STRUCTURES_DIR}" &&
 				echo "${STRUCTURES_DIR}/${HASH}" &&
 				true
 			else
