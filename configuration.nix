@@ -26,10 +26,10 @@
 	foobar = name : foo : utils.sh-derivation name { foo = foo ; } [ pkgs.coreutils ] ;
 	post-commit = name : remote : utils.sh-derivation name { remote = remote ; } [ pkgs.coreutils pkgs.git ] ;
 	rebuild-nixos = name : utils.sh-derivation name { } [ pkgs.coreutils pkgs.gnugrep pkgs.mktemp pkgs.rsync pkgs.systemd ] ;
-	structure = name : structures-dir : constructor-program : at : { cleaner-program ? "${ pkgs.coreutils }/bin/true" , salt-program ? "${ pkgs.coreutils }/bin/true" , seconds ? 60 } : utils.sh-derivation name { structures-dir = literal structures-dir ; constructor-program = literal constructor-program ; cleaner-program = literal cleaner-program ; salt-program = literal salt-program ; seconds = literal seconds ; } [ at pkgs.coreutils pkgs.utillinux ] ;
+	structure = name : structures-dir : constructor-program : at : { cleaner-program ? "${ pkgs.coreutils }/bin/true" , salt-program ? "${ pkgs.coreutils }/bin/true" , seconds ? 60 * 60 } : utils.sh-derivation name { structures-dir = literal structures-dir ; constructor-program = literal constructor-program ; cleaner-program = literal cleaner-program ; salt-program = literal salt-program ; seconds = literal seconds ; } [ at pkgs.coreutils pkgs.utillinux ] ;
     } ;
     structures = structures-dir : {
-        foo = uuid : utils.structure structures-dir "${ derivations.foo uuid }/bin/foo" { } ;
+        foo = uuid : utils.structure structures-dir "${ derivations.foo uuid }/bin/foo" { seconds = 60 ; } ;
     } ;
 in {
     boot = {
