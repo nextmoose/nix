@@ -49,8 +49,10 @@ EOF
 			then
 			    cd "${STRUCTURES_DIR}" &&
 				( cat <<EOF
+echo BEFORE 201 >> ${STRUCTURES_DIR}/at.log &&
 (
     ( flock 201 || exit 1 ) &&
+        echo BEFORE 202 >> ${STRUCTURES_DIR}/at.log &&
         (
             ( flock --exclusive 202 || exit 1 ) &&
                 cd "${STRUCTURES_DIR}/${HASH}" &&
