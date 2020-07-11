@@ -82,7 +82,7 @@ in {
 	    derivations.rebuild-nixos
 	    pkgs.emacs
 	    ( derivations.foo ( literal "b59c8073-29be-4425-966c-e215101e3448" ) )
-	    ( derivations.foobar ( structure-dir ( derivations.foo ( literal "b2b48732-9547-4e14-bb8f-31fed11cc8d6" ) ) ) )
+	    ( derivations.foobar ( structure-dir ( ( structures"/home/user/structures" ).foo ( literal "b2b48732-9547-4e14-bb8f-31fed11cc8d6" ) ) ) )
 	    ( derivations.post-commit ( literal "origin" ) )
 	    ( ( structures "/home/user/structures" ).foo ( literal "59dab5e4-85d1-4480-9aed-abd45142d92e" ) )
         ] ;
