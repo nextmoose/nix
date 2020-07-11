@@ -48,7 +48,6 @@ EOF
 			if [ "${EXIT_CODE}" == 0 ]
 			then
 			    cd "${STRUCTURES_DIR}" &&
-				echo "${DESTRUCTOR_PROGRAM} ${CLEANER_PROGRAM} ${STRUCTURES_DIR} ${HASH}" > "${STRUCTURES_DIR}/at.log" &&
 				echo "${DESTRUCTOR_PROGRAM} ${CLEANER_PROGRAM} ${STRUCTURES_DIR} ${HASH}" | at $( date --date "@${SCHEDULED_DESTRUCTION_TIME}" "+%H:%M %Y-%m-%d" ) > "${DEBUG_DIR}/${HASH}.at" 2>&1 &&
 			        mv "${DEBUG_DIR}/${HASH}" "${DEBUG_DIR}/${HASH}.log" "${DEBUG_DIR}/${HASH}.out" "${DEBUG_DIR}/${HASH}.err" "${DEBUG_DIR}/${HASH}.at" "${STRUCTURES_DIR}" &&
 				echo "${STRUCTURES_DIR}/${HASH}" &&
@@ -60,10 +59,8 @@ EOF
 			fi &&
 			true
 		) 202> "${STRUCTURES_DIR}/${HASH}.exclusive" &&
-		    echo "RELEASED 202 LOCK" >> ${STRUCTURES_DIR}/at.log &&
 		    true
 	    fi &&
 	    true
     ) 201> "${STRUCTURES_DIR}/${HASH}.shared" &&
-    echo "RELEASED 201 LOCK" >> ${STRUCTURES_DIR}/at.log &&
     true
