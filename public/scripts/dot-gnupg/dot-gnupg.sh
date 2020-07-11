@@ -1,6 +1,6 @@
 #!/bin/sh
 
-export GNUPG_HOMEDIR=$(pwd) &&
+export GNUPGHOME=$(pwd) &&
     gpg --batch --import "${GPG_PRIVATE_KEYS}" &&
     gpg --import-ownertrust "${GPG_OWNERTRUST}" &&
     gpg2 --import "${GPG2_PRIVATE_KEYS}" &&
