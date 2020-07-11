@@ -23,7 +23,7 @@
     derivations = utils.name-it {
         at = name : utils.sh-derivation name { } [ pkgs.coreutils ] ;
 	destructor = name : utils.sh-derivation name { } [ pkgs.coreutils ] ;
-	dot-gnupg = name : gpg-private-keys : gpg-ownertrust : gpg2-private-keys : gpg2-ownertrust : utils.sh-derivation name { gpg-private-keys = gpg-private-keys ; gpg-ownertrust = gpg-ownertrust ; gpg2-private-keys = gpg2-private-keys ; gpg2-ownertrust = gpg2-ownertrust ; } [ pkgs.gnupg ] ;
+	dot-gnupg = name : gpg-private-keys : gpg-ownertrust : gpg2-private-keys : gpg2-ownertrust : utils.sh-derivation name { gpg-private-keys = gpg-private-keys ; gpg-ownertrust = gpg-ownertrust ; gpg2-private-keys = gpg2-private-keys ; gpg2-ownertrust = gpg2-ownertrust ; uuid = literal "HELLO" ; } [ pkgs.gnupg ] ;
 	fetchFromGithub = name : owner : repo : rev : sha256 : pkgs.stdenv.mkDerivation {
 	    name = name ;
 	    src = pkgs.fetchFromGithub {
@@ -43,7 +43,7 @@
     } ;
     structures = structures-dir : {
         dot-gnupg = gpg-private-keys : gpg-ownertrust : gpg2-private-keys : gpg2-ownertrust : utils.structure structures-dir "${ derivations.dot-gnupg gpg-private-keys gpg-ownertrust gpg2-private-keys gpg2-ownertrust }/bin/dot-gnupg" { seconds = 121 ; } ;
-        foo = uuid : utils.structure structures-dir "${ derivations.foo uuid }/bin/foo" { seconds = 121 ; } ;
+        foo = uuid : utils.structure structures-dir "${ derivations.foo uuid }/bin/foo" { } ;
     } ;
 in {
     boot = {
