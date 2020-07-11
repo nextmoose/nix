@@ -66,7 +66,7 @@ EOF
     rm "${STRUCTURES_DIR}/${HASH}.shared &&
     true
 EOF
-				) | at $( date --date "@${SCHEDULED_DESTRUCTION_TIME}" "+%Y-%m-%d %H:%M" ) &&
+				) | at $( date --date "@${SCHEDULED_DESTRUCTION_TIME}" "+%H:%M %Y-%m-%d" ) &&
 				echo "${STRUCTURES_DIR}/${HASH}" &&
 				true
 			else

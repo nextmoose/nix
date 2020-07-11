@@ -1,4 +1,4 @@
 #!/bin/sh
 
-cat "${FOOBAR}/uuid.txt" &&
+cat "${FOO}/uuid.txt" &&
     true
