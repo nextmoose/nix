@@ -30,7 +30,7 @@
 	structure = name : structures-dir : constructor-program : destructor : at : { cleaner-program ? "${ pkgs.coreutils }/bin/true" , salt-program ? "${ pkgs.coreutils }/bin/true" , seconds ? 60 * 60 } : utils.sh-derivation name { structures-dir = literal structures-dir ; constructor-program = literal constructor-program ; cleaner-program = literal cleaner-program ; salt-program = literal salt-program ; seconds = literal seconds ; destructor-program = literal "${ destructor }/bin/destructor" ; } [ at pkgs.coreutils pkgs.utillinux ] ;
     } ;
     structures = structures-dir : {
-        foo = uuid : utils.structure structures-dir "${ derivations.foo uuid }/bin/foo" { seconds = 60 ; } ;
+        foo = uuid : utils.structure structures-dir "${ derivations.foo uuid }/bin/foo" { seconds = 15 ; } ;
     } ;
 in {
     boot = {
