@@ -1,5 +1,6 @@
 { config, pkgs, ... } : let
     literal = value : name : "--run \"export ${ utils.upper-case name }=${ builtins.replaceStrings [ "\"" ] [ "\\\"" ] ( builtins.toString value ) }\"" ;
+    structure-dir = value : name : "--run \"export ${ utils.upper-case name }=${ builtins.replaceStrings [ "\"" "\$" ] [ "\\\"" "\\\$" ] ( builtins.concatStringsSep "" [ "\$( " ( builtins.toString value ) "/bin/structure )" ] ) }\"" ;
     utils = {
         name-it = named : builtins.listToAttrs ( builtins.map ( name : { name = name ; value = builtins.getAttr name named name ; } ) ( builtins.attrNames named ) ) ;
         sh-derivation = name : sets : dependencies : pkgs.stdenv.mkDerivation {
@@ -21,13 +22,14 @@
     } ;
     derivations = utils.name-it {
         at = name : utils.sh-derivation name { } [ pkgs.coreutils ] ;
-        foobar = name : uuid : utils.sh-derivation name { uuid = uuid ; } [ pkgs.coreutils ] ;
+        foo = name : uuid : utils.sh-derivation name { uuid = uuid ; } [ pkgs.coreutils ] ;
+	foobar = name : foo : utils.sh-derivation name { foo = foo ; } [ pkgs.coreutils ] ;
 	post-commit = name : remote : utils.sh-derivation name { remote = remote ; } [ pkgs.coreutils pkgs.git ] ;
 	rebuild-nixos = name : utils.sh-derivation name { } [ pkgs.coreutils pkgs.gnugrep pkgs.mktemp pkgs.rsync pkgs.systemd ] ;
 	structure = name : structures-dir : constructor-program : at : { cleaner-program ? "${ pkgs.coreutils }/bin/true" , salt-program ? "${ pkgs.coreutils }/bin/true" , seconds ? 60 } : utils.sh-derivation name { structures-dir = literal structures-dir ; constructor-program = literal constructor-program ; cleaner-program = literal cleaner-program ; salt-program = literal salt-program ; } [ at pkgs.coreutils pkgs.utillinux ] ;
     } ;
     structures = structures-dir : {
-        foobar = uuid : utils.structure structures-dir "${ derivations.foobar uuid }/bin/foobar" { } ;
+        foo = uuid : utils.structure structures-dir "${ derivations.foobar uuid }/bin/foobar" { } ;
     } ;
 in {
     boot = {
@@ -79,9 +81,10 @@ in {
 	    pkgs.git
 	    derivations.rebuild-nixos
 	    pkgs.emacs
-	    ( derivations.foobar ( literal "b59c8073-29be-4425-966c-e215101e3448" ) )
+	    ( derivations.foo ( literal "b59c8073-29be-4425-966c-e215101e3448" ) )
+	    ( derivations.foobar ( structure-dir ( derivations.foo ( literal "b2b48732-9547-4e14-bb8f-31fed11cc8d6" ) ) ) )
 	    ( derivations.post-commit ( literal "origin" ) )
-	    ( ( structures "/home/user/structures" ).foobar ( literal "59dab5e4-85d1-4480-9aed-abd45142d92e" ) )
+	    ( ( structures "/home/user/structures" ).foo ( literal "59dab5e4-85d1-4480-9aed-abd45142d92e" ) )
         ] ;
     } ;
 }
