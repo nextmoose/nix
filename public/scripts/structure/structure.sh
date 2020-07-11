@@ -33,7 +33,7 @@ EOF
 			DEBUG_DIR=$( mktemp -d "${STRUCTURES_DIR}/${HASH}.debug/XXXXXXXX" ) &&
 			cd "${DEBUG_DIR}" &&
 			BEFORE=$( date +%s ) &&
-			"${CONSTRUCTOR}" > "${DEBUG_DIR}/${HASH}.out" 2> "${DEBUG_DIR}/${HASH}.err" &&
+			( "${CONSTRUCTOR_PROGRAM}" > "${DEBUG_DIR}/${HASH}.out" 2> "${DEBUG_DIR}/${HASH}.err" || true ) &&
 			EXIT_CODE="${?}" &&
 			AFTER=$( date +%s ) &&
 			( cat > "${DEBUG_DIR}/${HASH}.log" <<EOF
