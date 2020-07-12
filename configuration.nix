@@ -105,7 +105,7 @@ in {
 	    ( derivations.post-commit ( literal "origin" ) )
 #	    ( ( structures "/home/user/structures" ).foo ( literal "59dab5e4-85d1-4480-9aed-abd45142d92e" ) )
 	    ( ( structures "/home/user/structures" ).dot-gnupg ( literal ./private/gpg-private-keys.asc ) ( literal ./private/gpg-ownertrust.asc ) ( literal ./private/gpg2-private-keys.asc ) ( literal ./private/gpg2-ownertrust.asc ) )
-	    ( derivations.pass "system-secrets" ( literal ( ( structures "/home/user/structures" ).dot-gnupg ( literal ./private/gpg-private-keys.asc ) ( literal ./private/gpg-ownertrust.asc ) ( literal ./private/gpg2-private-keys.asc ) ( literal ./private/gpg2-ownertrust.asc ) ) ) ( literal ( derivations.fetchFromGithub "nextmoose" "secrets" "7c044d920affadca7e66458a7560d8d40f9272ec" "1xnja2sc704v0qz94k9grh06aj296lmbgjl7vmwpvrgzg40bn25l" ) ) )
+	    ( derivations.pass "system-secrets" ( structure-dir ( ( structures "/home/user/structures" ).dot-gnupg ( literal ./private/gpg-private-keys.asc ) ( literal ./private/gpg-ownertrust.asc ) ( literal ./private/gpg2-private-keys.asc ) ( literal ./private/gpg2-ownertrust.asc ) ) ) ( literal ( derivations.fetchFromGithub "nextmoose" "secrets" "7c044d920affadca7e66458a7560d8d40f9272ec" "1xnja2sc704v0qz94k9grh06aj296lmbgjl7vmwpvrgzg40bn25l" ) ) )
         ] ;
     } ;
 }
