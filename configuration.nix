@@ -99,6 +99,8 @@ in {
         packages = [
 	    pkgs.git
 	    pkgs.gnupg
+	    pkgs.pinentry
+	    pkgs.pinentry-qt
 	    derivations.rebuild-nixos
 	    pkgs.emacs
 	    ( derivations.foo ( literal "b59c8073-29be-4425-966c-e215101e3448" ) )
