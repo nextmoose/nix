@@ -106,7 +106,7 @@ in {
 #	    pkgs.pinentry-emacs pkgs.pinentry-gnome pkgs.pinentry-gtk2
 	    # pkgs.pinentry_mac
 	    pkgs.signing-party
-	    pkgs.pinentry-curses
+#	    pkgs.pinentry-curses
 	    derivations.rebuild-nixos
 	    pkgs.emacs
 	    ( derivations.foo ( literal "b59c8073-29be-4425-966c-e215101e3448" ) )
