@@ -101,9 +101,9 @@ in {
 	    pkgs.gnupg
 	    pkgs.gpgme
 	    pkgs.keychain
-	    pkgs.pinentry
+#	    pkgs.pinentry
 	    pkgs.pinentry-qt
-	    pkgs.pinentry-emacs pkgs.pinentry-gnome pkgs.pinentry-gtk2
+#	    pkgs.pinentry-emacs pkgs.pinentry-gnome pkgs.pinentry-gtk2
 	    # pkgs.pinentry_mac
 	    pkgs.signing-party
 	    pkgs.pinentry-curses
