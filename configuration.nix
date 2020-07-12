@@ -99,6 +99,7 @@ in {
         packages = [
 	    pkgs.git
 	    pkgs.gnupg
+	    pkgs.gpgme
 	    pkgs.pinentry
 	    pkgs.pinentry-qt
 	    derivations.rebuild-nixos
