@@ -40,7 +40,7 @@
 	    name = name ;
 	    src = ./empty ;
 	    buildInputs = [ pkgs.makeWrapper ] ;
-	    installPhase = "makeWrapper ${ pkgs.pass }/bin/pass $out/bin/${ executable-name } ${ dot-gnupg "dot-gnupg" } ${ password-store-dir "password-store-dir" } --run 'export PASSWORD_STORE_GPG_OPTS=\"--homedir \$DOT_GNUPG\"' --set PATH ${ pkgs.lib.makeBinPath [ pkgs.pinentry pkgs.pinentry-qt ] }" ;
+	    installPhase = "makeWrapper ${ pkgs.pass }/bin/pass $out/bin/${ executable-name } ${ dot-gnupg "dot-gnupg" } ${ password-store-dir "password-store-dir" } --run 'export PASSWORD_STORE_GPG_OPTS=\"--batch --pinentry loopback --homedir \$DOT_GNUPG\"' --set PATH ${ pkgs.lib.makeBinPath [ pkgs.pinentry pkgs.pinentry-qt ] }" ;
 	} ;
 	post-commit = name : remote : utils.sh-derivation name { remote = remote ; } [ pkgs.coreutils pkgs.git ] ;
 	rebuild-nixos = name : utils.sh-derivation name { } [ pkgs.coreutils pkgs.gnugrep pkgs.mktemp pkgs.rsync pkgs.systemd ] ;
