@@ -42,6 +42,7 @@
 	    buildInputs = [ pkgs.makeWrapper ] ;
 	    installPhase = "makeWrapper ${ pkgs.pass }/bin/pass $out/bin/${ executable-name } ${ dot-gnupg "dot-gnupg" } ${ password-store-dir "password-store-dir" } --run 'export PASSWORD_STORE_GPG_OPTS=\"--homedir \$DOT_GNUPG\"' --run 'export GPG_TTY=\$(${pkgs.coreutils}/bin/tty)' --set PATH ${ pkgs.lib.makeBinPath [ pkgs.pinentry pkgs.pinentry-qt ] }" ;
 	} ;
+	pass-kludge = name : utils.sh-derivation name { } [ pkgs.coreutils pkgs.gnupg ] ;
 	post-commit = name : remote : utils.sh-derivation name { remote = remote ; } [ pkgs.coreutils pkgs.git ] ;
 	rebuild-nixos = name : utils.sh-derivation name { } [ pkgs.coreutils pkgs.gnugrep pkgs.mktemp pkgs.rsync pkgs.systemd ] ;
 	structure = name : structures-dir : constructor-program : destructor : { cleaner-program ? "${ pkgs.coreutils }/bin/true" , salt-program ? "${ pkgs.coreutils }/bin/true" , seconds ? 60 * 60 } : utils.sh-derivation name { structures-dir = literal structures-dir ; constructor-program = literal constructor-program ; cleaner-program = literal cleaner-program ; salt-program = literal salt-program ; seconds = literal seconds ; destructor-program = literal "${ destructor }/bin/destructor" ; } [ pkgs.coreutils pkgs.utillinux ] ;
@@ -109,6 +110,7 @@ in {
  	    pkgs.signing-party
 	    pkgs.pinentry-curses
 	    derivations.rebuild-nixos
+	    derivations.pass-kludge
 	    pkgs.emacs
 	    ( derivations.foo ( literal "b59c8073-29be-4425-966c-e215101e3448" ) )
 	    ( derivations.foobar ( structure-dir ( ( structures"/home/user/structures" ).foo ( literal "b2b48732-9547-4e14-bb8f-31fed11cc8d6" ) ) ) )
