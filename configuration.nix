@@ -2,7 +2,7 @@
     literal = value : name : "--run \"export ${ utils.upper-case name }=${ builtins.replaceStrings [ "\"" ] [ "\\\"" ] ( builtins.toString value ) }\"" ;
     structure-dir = value : name : "--run \"export ${ utils.upper-case name }=${ builtins.replaceStrings [ "\"" "\$" ] [ "\\\"" "\\\$" ] ( builtins.concatStringsSep "" [ "\$( " ( builtins.toString value ) "/bin/structure )" ] ) }\"" ;
     structure-file = value : file-name : name : "--run \"export ${ utils.upper-case name }=${ builtins.replaceStrings [ "\"" "\$" ] [ "\\\"" "\\\$" ] ( builtins.concatStringsSep "" [ "\$( " ( builtins.toString value ) "/bin/structure )" "/" file-name ] ) }\"" ; 
-    structure-cat = value : file-name : name : "--run \"export ${ utils.upper-case name }=${ builtins.replaceStrings [ "\"" "\$" ] [ "\\\"" "\\\$" ] ( builtins.concatStringsSep "" [ "\$( " pkgs.coreutils "/bin/cat" "\$( " ( builtins.toString value ) "/bin/structure )" "/" file-name " )" ] ) }\"" ;
+    structure-cat = value : file-name : name : "--run \"export ${ utils.upper-case name }=${ builtins.replaceStrings [ "\"" "\$" ] [ "\\\"" "\\\$" ] ( builtins.concatStringsSep "" [ "\$( " pkgs.coreutils "/bin/cat " "\$( " ( builtins.toString value ) "/bin/structure )" "/" file-name " )" ] ) }\"" ;
    utils = {
         name-it = named : builtins.listToAttrs ( builtins.map ( name : { name = name ; value = builtins.getAttr name named name ; } ) ( builtins.attrNames named ) ) ;
         sh-derivation = name : sets : dependencies : pkgs.stdenv.mkDerivation {
