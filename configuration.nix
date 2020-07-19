@@ -39,10 +39,14 @@
 	pass = name : executable-name : dot-gnupg : password-store-dir : extensions : pkgs.stdenv.mkDerivation {
 	    name = name ;
 	    src = ./empty ;
-	    buildInputs = [ pkgs.makeWrapper ] ;
+	    buildInputs = [ pkgs.coreutils pkgs.gnused pkgs.makeWrapper ] ;
 	    installPhase = ''
 	        makeWrapper ${ pkgs.pass }/bin/pass $out/bin/${ executable-name } ${ dot-gnupg "dot-gnupg" } ${ password-store-dir "password-store-dir" } --run "export PASSWORD_STORE_GPG_OPTS=\"--homedir \$DOT_GNUPG\"" --run "export GPG_TTY=\$(${pkgs.coreutils}/bin/tty)" --run "export PASSWORD_STORE_ENABLE_EXTENSIONS=true" --run "export PASSWORD_STORE_EXTENSIONS_DIR=\"$out/extensions\"" --set PATH ${ pkgs.lib.makeBinPath [ pkgs.pinentry pkgs.pinentry-qt ] }
 		${ builtins.concatStringsSep " && " ( builtins.map ( name : "makeWrapper ${ ( builtins.getAttr name extensions ).program } $out/extensions/${ name }.bash" ) ( builtins.attrNames extensions ) ) }
+		sed \
+		    -e "s#_pass#_pass_$( basename $out )_#" \
+		    -e "s# pass# ${ executable-name }#" \
+		    ${ pkgs.pass }/share/bash-completion/completions/pass
 	    '' ;
 	} ;
 	pass-kludge = name : utils.sh-derivation name { } [ pkgs.coreutils pkgs.gnupg ] ;
