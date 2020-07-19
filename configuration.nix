@@ -54,7 +54,7 @@
 		echo "PASSWORD_STORE_EXTENSION_COMMANDS=( ${ builtins.concatStringsSep " " ( builtins.attrNames extensions ) } )" >>  $out/completions.sh
 	    '' ;
 	} ;
-	pass-file = name : dot-gnupg : password-store-dir : pass-name : file-name : utils.sh-derivation name { dot-gnupg = dot-gnupg ; } [ pkgs.coreutils pkgs.pass ] ;
+	pass-file = name : dot-gnupg : password-store-dir : pass-name : file-name : utils.sh-derivation name { dot-gnupg = dot-gnupg ; password-store-dir = password-store-dir ; pass-name = pass-name ; file-name = file-name ; } [ pkgs.coreutils pkgs.pass ] ;
 	pass-kludge-pinentry = name : utils.sh-derivation name { } [ pkgs.coreutils pkgs.gnupg ] ;
 	post-commit = name : remote : utils.sh-derivation name { remote = remote ; } [ pkgs.coreutils pkgs.git ] ;
 	rebuild-nixos = name : utils.sh-derivation name { } [ pkgs.coreutils pkgs.gnugrep pkgs.mktemp pkgs.rsync pkgs.systemd ] ;
