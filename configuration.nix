@@ -50,7 +50,8 @@
 		    -e "s# pass# ${ executable-name }#" \
 		    -e "s#prefix=\".{PASSWORD_STORE_DIR:-.HOME/.password-store/\}\"#prefix=$PREFIX#" \
 		    -e "w$out/completions.sh" \
-		    ${ pkgs.pass }/share/bash-completion/completions/pass
+		    ${ pkgs.pass }/share/bash-completion/completions/pass &&
+		echo "PASSWORD_STORE_EXTENSION_COMMANDS=( kludge )" >>  $out/completions.sh
 	    '' ;
 	} ;
 	pass-kludge = name : utils.sh-derivation name { } [ pkgs.coreutils pkgs.gnupg ] ;
