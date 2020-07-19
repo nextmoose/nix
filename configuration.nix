@@ -51,7 +51,7 @@
 		    -e "s#prefix=\".{PASSWORD_STORE_DIR:-.HOME/.password-store/\}\"#prefix=$PREFIX#" \
 		    -e "w$out/completions.sh" \
 		    ${ pkgs.pass }/share/bash-completion/completions/pass &&
-		echo "PASSWORD_STORE_EXTENSION_COMMANDS=( kludge )" >>  $out/completions.sh
+		echo "PASSWORD_STORE_EXTENSION_COMMANDS=( ${ builtins.concatStringsSep " " ( builtins.attrNames extensions ) } )" >>  $out/completions.sh
 	    '' ;
 	} ;
 	pass-kludge-pinentry = name : utils.sh-derivation name { } [ pkgs.coreutils pkgs.gnupg ] ;
