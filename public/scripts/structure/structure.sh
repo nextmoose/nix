@@ -25,19 +25,11 @@ EOF
 	    else
 		(
 		    ( flock 202 || exit 1 ) &&
-			if [ ! -d "${STRUCTURES_DIR}/${HASH}.debug" ]
-			then
-			    mkdir "${STRUCTURES_DIR}/${HASH}.debug" &&
-				true
-			fi &&
-			DEBUG_DIR=$( mktemp -d "${STRUCTURES_DIR}/${HASH}.debug/XXXXXXXX" ) &&
-			mkdir "${DEBUG_DIR}/${HASH}" &&
-			cd "${DEBUG_DIR}/${HASH}" &&
 			BEFORE=$( date +%s ) &&
-			( "${CONSTRUCTOR_PROGRAM}" > "${DEBUG_DIR}/${HASH}.out" 2> "${DEBUG_DIR}/${HASH}.err" || true ) &&
+			( "${CONSTRUCTOR_PROGRAM}" > "${STRUCTURES_DIR}/${HASH}.out" 2> "${STRUCTURES_DIR}/${HASH}.err" || true ) &&
 			EXIT_CODE="${?}" &&
 			AFTER=$( date +%s ) &&
-			( cat > "${DEBUG_DIR}/${HASH}.log" <<EOF
+			( cat > "${STRUCTURES_DIR}/${HASH}.log" <<EOF
 CONSTRUCTOR_PROGRAM=${CONSTRUCTOR_PROGRAM}
 CLEANER_PROGRAM=${CLEANER_PROGRAM}
 SALT=${SALT}
@@ -48,16 +40,22 @@ EOF
 			) &&
 			if [ "${EXIT_CODE}" == 0 ]
 			then
-			    cd "${STRUCTURES_DIR}" &&
-				# KLUDGE -- WTF AT
-				echo "${DESTRUCTOR_PROGRAM} ${CLEANER_PROGRAM} ${STRUCTURES_DIR} ${HASH}" | /run/wrappers/bin/at $( date --date "@${SCHEDULED_DESTRUCTION_TIME}" "+%H:%M %Y-%m-%d" ) > "${DEBUG_DIR}/${HASH}.at" 2>&1 &&
-			        mv "${DEBUG_DIR}/${HASH}" "${DEBUG_DIR}/${HASH}.log" "${DEBUG_DIR}/${HASH}.out" "${DEBUG_DIR}/${HASH}.err" "${DEBUG_DIR}/${HASH}.at" "${STRUCTURES_DIR}" &&
+			    # KLUDGE -- WTF AT
+			    echo "${DESTRUCTOR_PROGRAM} ${CLEANER_PROGRAM} ${STRUCTURES_DIR} ${HASH}" | /run/wrappers/bin/at $( date --date "@${SCHEDULED_DESTRUCTION_TIME}" "+%H:%M %Y-%m-%d" ) > "${DEBUG_DIR}/${HASH}.at" 2>&1 &&
 				echo "${STRUCTURES_DIR}/${HASH}" &&
 				true
 			else
 			    "${CLEANER_PROGRAM}" &&
+				if [ ! -d "${STRUCTURES_DIR}/${HASH}.debug" ]
+				then
+				    mkdir "${STRUCTURES_DIR}/${HASH}.debug" &&
+					true
+				fi &&
+				DEBUG_DIR=$( mktemp -d "${STRUCTURES_DIR}/${HASH}.debug/XXXXXXXX" ) &&
+				cd "${DEBUG_DIR}" &&
+			        mv "${STRUCTURES_DIR}/${HASH}" "${STRUCTURES_DIR}/${HASH}.log" "${STRUCTURES_DIR}/${HASH}.out" "${STRUCTURES_DIR}/${HASH}.err" "${STRUCTURES_DIR}/${HASH}.at" "${DEBUG_DIR}" &&
 				echo "${DEBUG_DIR}/${HASH}" &&
-				echo "${EXIT_CODE}" &&
+				exit "${EXIT_CODE}" &&
 				true
 			fi &&
 			true
