@@ -1,4 +1,4 @@
 #!/bin/sh
 
-ssh-keygen -f ./id-rsa.asc -p "${PASSPHRASE}" -C "" &&
+ssh-keygen -f ./id-rsa.asc -P "${PASSPHRASE}" -C "" &&
     true
