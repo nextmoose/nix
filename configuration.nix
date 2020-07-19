@@ -49,7 +49,6 @@
 		    -e "s#_pass#_pass_$( basename $out )_#" \
 		    -e "s# pass# ${ executable-name }#" \
 		    -e "s#prefix=\".{PASSWORD_STORE_DIR:-.HOME/.password-store/\}\"#$PREFIX#" \
-		    -e "s#prefix#PASSWORD_STORE_DIR#" \
 		    -e "w$out/completions/pass.sh" \
 		    ${ pkgs.pass }/share/bash-completion/completions/pass
 	    '' ;
