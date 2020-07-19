@@ -47,6 +47,7 @@
 		sed \
 		    -e "s#_pass#_pass_$( basename $out )_#" \
 		    -e "s# pass# ${ executable-name }#" \
+		    -e "s#\"..PASSWORD_STORE_DIR:-.HOME/.password-store/.\"#xxx#" \
 		    -e "w$out/completions/pass.sh" \
 		    ${ pkgs.pass }/share/bash-completion/completions/pass
 	    '' ;
