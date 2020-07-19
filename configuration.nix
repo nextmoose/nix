@@ -1,6 +1,7 @@
 { config, pkgs, ... } : let
     literal = value : name : "--run \"export ${ utils.upper-case name }=${ builtins.replaceStrings [ "\"" ] [ "\\\"" ] ( builtins.toString value ) }\"" ;
     structure-dir = value : name : "--run \"export ${ utils.upper-case name }=${ builtins.replaceStrings [ "\"" "\$" ] [ "\\\"" "\\\$" ] ( builtins.concatStringsSep "" [ "\$( " ( builtins.toString value ) "/bin/structure )" ] ) }\"" ;
+    structure-file = value : name : file-name : "--run \"export ${ utils.upper-case name }=${ builtins.replaceStrings [ "\"" "\$" ] [ "\\\"" "\\\$" ] ( builtins.concatStringsSep "" [ "\$( " ( builtins.toString value ) "/bin/structure )" "/" file-name ] ) }\"" ;
     utils = {
         name-it = named : builtins.listToAttrs ( builtins.map ( name : { name = name ; value = builtins.getAttr name named name ; } ) ( builtins.attrNames named ) ) ;
         sh-derivation = name : sets : dependencies : pkgs.stdenv.mkDerivation {
@@ -57,6 +58,7 @@
 	} ;
 	pass-file = name : dot-gnupg : password-store-dir : pass-name : file-name : utils.sh-derivation name { dot-gnupg = dot-gnupg ; password-store-dir = password-store-dir ; pass-name = pass-name ; file-name = file-name ; } [ pkgs.coreutils pkgs.pass ] ;
 	pass-kludge-pinentry = name : utils.sh-derivation name { } [ pkgs.coreutils pkgs.gnupg ] ;
+	personal-identification-number = name : digits : utils.sh-derivation name { digits = digits ; } [ pkgs.coreutils ] ;
 	post-commit = name : remote : utils.sh-derivation name { remote = remote ; } [ pkgs.coreutils pkgs.git ] ;
 	rebuild-nixos = name : utils.sh-derivation name { } [ pkgs.coreutils pkgs.gnugrep pkgs.mktemp pkgs.rsync pkgs.systemd ] ;
 	structure = name : structures-dir : constructor-program : destructor : { cleaner-program ? "${ pkgs.coreutils }/bin/true" , salt-program ? "${ pkgs.coreutils }/bin/true" , seconds ? 60 * 60 } : utils.sh-derivation name { structures-dir = literal structures-dir ; constructor-program = literal constructor-program ; cleaner-program = literal cleaner-program ; salt-program = literal salt-program ; seconds = literal seconds ; destructor-program = literal "${ destructor }/bin/destructor" ; } [ pkgs.coreutils pkgs.utillinux ] ;
@@ -65,6 +67,7 @@
         dot-gnupg = gpg-private-keys : gpg-ownertrust : gpg2-private-keys : gpg2-ownertrust : utils.structure structures-dir "${ derivations.dot-gnupg gpg-private-keys gpg-ownertrust gpg2-private-keys gpg2-ownertrust }/bin/dot-gnupg" { } ;
         foo = uuid : utils.structure structures-dir "${ derivations.foo uuid }/bin/foo" { } ;
 	pass-file = dot-gnupg : password-store-dir : pass-name : file-name : utils.structure structures-dir "${ derivations.pass-file dot-gnupg password-store-dir pass-name file-name }/bin/pass-file" { } ;
+	personal-identification-number = digits : utils.structure structures-dir "${ derivations.personal-identification-number digits }/bin/personal-identification-number" { } ;
     } ;
 in {
     boot = {
@@ -130,7 +133,7 @@ in {
 	    ( derivations.foo ( literal "b59c8073-29be-4425-966c-e215101e3448" ) )
 	    ( derivations.foobar ( structure-dir ( ( structures"/home/user/structures" ).foo ( literal "b2b48732-9547-4e14-bb8f-31fed11cc8d6" ) ) ) )
 	    ( derivations.post-commit ( literal "origin" ) )
-	    ( utils.system-secret "uuid" "uuid.txt" )
+	    ( ( structures "/home/user/structures" ).personal-identification-number ( literal 6 ) )
 	    ( derivations.pass "system-secrets" ( structure-dir ( ( structures "/home/user/structures" ).dot-gnupg ( literal ./private/gpg-private-keys.asc ) ( literal ./private/gpg-ownertrust.asc ) ( literal ./private/gpg2-private-keys.asc ) ( literal ./private/gpg2-ownertrust.asc ) ) ) ( literal ( derivations.fetchFromGithub "nextmoose" "secrets" "7c044d920affadca7e66458a7560d8d40f9272ec" "1xnja2sc704v0qz94k9grh06aj296lmbgjl7vmwpvrgzg40bn25l" ) ) { kludge-pinentry = { program = "${ derivations.pass-kludge-pinentry }/bin/pass-kludge-pinentry" ; } ; } )
         ] ;
     } ;
