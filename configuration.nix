@@ -2,7 +2,7 @@
     literal = value : name : "--run \"export ${ utils.upper-case name }=${ utils.replace-strings ( builtins.toString value ) }\"" ;
     literals = values : "--add-flags ${ builtins.concatStringsSep " " ( builtins.map ( value : utils.replace-strings ( builtins.toString value ) ) values ) }" ;
     structure-dir = value : name : "--run \"export ${ utils.upper-case name }=${ utils.replace-strings ( builtins.concatStringsSep "" [ "\$( " ( builtins.toString value ) "/bin/structure )" ] ) }\"" ;
-    structure-dirs = values : name : "--add-flags ${ builtins.concatStringsSep " " ( builtins.map ( value : "stuff" ) values ) }" ;
+    structure-dirs = values : name : "--add-flags ${ builtins.concatStringsSep " " ( builtins.map ( value : "typeof=${ builtins.typeOf value }" ) values ) }" ;
     tstructure-dirs = values : name : "--add-flags ${ builtins.concatStringsSep " " ( builtins.map ( value : utils.replace-strings ( "$( ${ value }/bin/structure )" ) ) values ) }" ;
     structure-file = value : file-name : name : "--run \"export ${ utils.upper-case name }=${ utils.replace-strings ( builtins.concatStringsSep "" [ "\$( " ( builtins.toString value ) "/bin/structure )" "/" file-name ] ) }\"" ;
     structure-cat = value : file-name : name : "--run \"export ${ utils.upper-case name }=${ utils.replace-strings ( builtins.concatStringsSep "" [ "\$( " pkgs.coreutils "/bin/cat " "\$( " ( builtins.toString value ) "/bin/structure )" "/" file-name " )" ] ) }\"" ;
