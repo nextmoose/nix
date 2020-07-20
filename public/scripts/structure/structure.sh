@@ -25,6 +25,8 @@ EOF
 	    else
 		(
 		    ( flock 202 || exit 1 ) &&
+			mkdir "${STRUCTURES_DIR}/${HASH}" &&
+			cd "${STRUCTURES_DIR}/${HASH}" &&
 			BEFORE=$( date +%s ) &&
 			( "${CONSTRUCTOR_PROGRAM}" > "${STRUCTURES_DIR}/${HASH}.out" 2> "${STRUCTURES_DIR}/${HASH}.err" || true ) &&
 			EXIT_CODE="${?}" &&
