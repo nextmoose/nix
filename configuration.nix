@@ -2,7 +2,7 @@
     literal = value : name : "--run \"export ${ utils.upper-case name }=${ utils.replace-strings ( builtins.toString value ) }\"" ;
     literals = values : "--add-flags ${ builtins.concatStringsSep " " ( builtins.map ( value : utils.replace-strings ( builtins.toString value ) ) values ) }" ;
     structure-dir = value : name : "--run \"export ${ utils.upper-case name }=${ utils.replace-strings ( builtins.concatStringsSep "" [ "\$( " ( builtins.toString value ) "/bin/structure )" ] ) }\"" ;
-    structure-dirs = values : "--add-flags ${ builtins.concatStringsSep " " ( builtins.map ( value : utils.replace-strings ( "$( ${ value }/bin/structure )" ) ) values ) }" ;
+    structure-dirs = values : name : "--add-flags ${ builtins.concatStringsSep " " ( builtins.map ( value : utils.replace-strings ( "$( ${ value }/bin/structure )" ) ) values ) }" ;
     structure-file = value : file-name : name : "--run \"export ${ utils.upper-case name }=${ utils.replace-strings ( builtins.concatStringsSep "" [ "\$( " ( builtins.toString value ) "/bin/structure )" "/" file-name ] ) }\"" ;
     structure-cat = value : file-name : name : "--run \"export ${ utils.upper-case name }=${ utils.replace-strings ( builtins.concatStringsSep "" [ "\$( " pkgs.coreutils "/bin/cat " "\$( " ( builtins.toString value ) "/bin/structure )" "/" file-name " )" ] ) }\"" ;
     utils = {
@@ -42,6 +42,7 @@
 	} ;
         foo = name : uuid : utils.sh-derivation name { uuid = uuid ; } [ pkgs.coreutils ] ;
 	foobar = name : foo : utils.sh-derivation name { foo = foo ; } [ pkgs.coreutils ] ;
+	multiple-site-dot-ssh = name : configs : utils.sh-derivation name { configs = configs ; } [ pkgs.coreutils ] ;
 	pass = name : executable-name : dot-gnupg : password-store-dir : extensions : pkgs.stdenv.mkDerivation {
 	    name = name ;
 	    src = ./empty ;
@@ -72,6 +73,7 @@
     structures = structures-dir : {
         dot-gnupg = gpg-private-keys : gpg-ownertrust : gpg2-private-keys : gpg2-ownertrust : utils.structure structures-dir "${ derivations.dot-gnupg gpg-private-keys gpg-ownertrust gpg2-private-keys gpg2-ownertrust }/bin/dot-gnupg" { } ;
         foo = uuid : utils.structure structures-dir "${ derivations.foo uuid }/bin/foo" { } ;
+	multiple-site-dot-ssh = configs : utils.structure structures-dir "${ derivations.multiple-site-dot-ssh configs }/bin/multiple-site-dot-ssh" { } ;
 	pass-file = dot-gnupg : password-store-dir : pass-name : file-name : utils.structure structures-dir "${ derivations.pass-file dot-gnupg password-store-dir pass-name file-name }/bin/pass-file" { } ;
 	personal-identification-number = file-name : digits : uuid : utils.structure structures-dir "${ derivations.personal-identification-number file-name digits uuid }/bin/personal-identification-number" { } ;
 	single-site-dot-ssh = host : host-name : user : port : identity-file : user-known-hosts-file : utils.structure structures-dir "${ derivations.single-site-dot-ssh host host-name user port identity-file user-known-hosts-file }/bin/single-site-dot-ssh" { } ;
