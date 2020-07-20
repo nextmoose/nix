@@ -42,7 +42,7 @@
 	} ;
         foo = name : uuid : utils.sh-derivation name { uuid = uuid ; } [ pkgs.coreutils ] ;
 	foobar = name : foo : utils.sh-derivation name { foo = foo ; } [ pkgs.coreutils ] ;
-	multiple-site-dot-ssh = name : configs : utils.sh-derivation name { configs = configs ; } [ pkgs.coreutils ] ;
+	multiple-site-dot-ssh = name : configs : utils.sh-derivation name { } [ pkgs.coreutils ] ;
 	pass = name : executable-name : dot-gnupg : password-store-dir : extensions : pkgs.stdenv.mkDerivation {
 	    name = name ;
 	    src = ./empty ;
@@ -145,7 +145,8 @@ in {
 	    ( derivations.post-commit ( literal "origin" ) )
 #	    ( ( structures "/home/user/structures" ).personal-identification-number ( literal "pin.asc" ) ( literal 6 ) ( literal "67b4e892-ef69-4253-9e21-459a1c33645a" ) )
 #	    ( ( structures "/home/user/structures" ).ssh-keygen ( structure-cat ( ( structures "/home/user/structures" ).personal-identification-number ( literal "pin.asc" ) ( literal 6 ) ( literal "67b4e892-ef69-4253-9e21-459a1c33645a" ) ) "pin.asc" ) )
-	    ( ( structures "/home/user/structures" ).single-site-dot-ssh ( literal "upstream" ) ( literal "github.com" ) ( literal "git" ) ( literal 22 ) ( structure-file ( ( structures "/home/user/structures" ).ssh-keygen ( structure-cat ( ( structures "/home/user/structures" ).personal-identification-number ( literal "pin.asc" ) ( literal 6 ) ( literal "67b4e892-ef69-4253-9e21-459a1c33645a" ) ) "pin.asc" ) ) "id-rsa.asc" ) ( structure-file ( utils.system-secret "upstream.known_hosts" "known-hosts.asc" ) "known-hosts.asc" ) )
+#	    ( ( structures "/home/user/structures" ).single-site-dot-ssh ( literal "upstream" ) ( literal "github.com" ) ( literal "git" ) ( literal 22 ) ( structure-file ( ( structures "/home/user/structures" ).ssh-keygen ( structure-cat ( ( structures "/home/user/structures" ).personal-identification-number ( literal "pin.asc" ) ( literal 6 ) ( literal "67b4e892-ef69-4253-9e21-459a1c33645a" ) ) "pin.asc" ) ) "id-rsa.asc" ) ( structure-file ( utils.system-secret "upstream.known_hosts" "known-hosts.asc" ) "known-hosts.asc" ) )
+	    ( ( structures "/home/user/structures" ).multiple-site-dot-ssh ( structure-dirs [ ( ( structures "/home/user/structures" ).single-site-dot-ssh ( literal "upstream" ) ( literal "github.com" ) ( literal "git" ) ( literal 22 ) ( structure-file ( ( structures "/home/user/structures" ).ssh-keygen ( structure-cat ( ( structures "/home/user/structures" ).personal-identification-number ( literal "pin.asc" ) ( literal 6 ) ( literal "67b4e892-ef69-4253-9e21-459a1c33645a" ) ) "pin.asc" ) ) "id-rsa.asc" ) ( structure-file ( utils.system-secret "upstream.known_hosts" "known-hosts.asc" ) "known-hosts.asc" ) ) ] ) )
 #	    ( utils.system-secret "upstream.known_hosts" "known-hosts.asc" )
 	    ( derivations.pass "system-secrets" ( structure-dir ( ( structures "/home/user/structures" ).dot-gnupg ( literal ./private/gpg-private-keys.asc ) ( literal ./private/gpg-ownertrust.asc ) ( literal ./private/gpg2-private-keys.asc ) ( literal ./private/gpg2-ownertrust.asc ) ) ) ( literal ( derivations.fetchFromGithub "nextmoose" "secrets" "7c044d920affadca7e66458a7560d8d40f9272ec" "1xnja2sc704v0qz94k9grh06aj296lmbgjl7vmwpvrgzg40bn25l" ) ) { kludge-pinentry = { program = "${ derivations.pass-kludge-pinentry }/bin/pass-kludge-pinentry" ; } ; } )
         ] ;
