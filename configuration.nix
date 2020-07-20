@@ -2,7 +2,8 @@
     literal = value : name : "--run \"export ${ utils.upper-case name }=${ utils.replace-strings ( builtins.toString value ) }\"" ;
     literals = values : "--add-flags ${ builtins.concatStringsSep " " ( builtins.map ( value : utils.replace-strings ( builtins.toString value ) ) values ) }" ;
     structure-dir = value : name : "--run \"export ${ utils.upper-case name }=${ utils.replace-strings ( builtins.concatStringsSep "" [ "\$( " ( builtins.toString value ) "/bin/structure )" ] ) }\"" ;
-    structure-dirs = values : name : "--add-flags ${ builtins.concatStringsSep " " ( builtins.map ( value : utils.replace-strings ( "$( ${ value }/bin/structure )" ) ) values ) }" ;
+    structure-dirs = values : name : "--add-flags stuff" ;
+    tstructure-dirs = values : name : "--add-flags ${ builtins.concatStringsSep " " ( builtins.map ( value : utils.replace-strings ( "$( ${ value }/bin/structure )" ) ) values ) }" ;
     structure-file = value : file-name : name : "--run \"export ${ utils.upper-case name }=${ utils.replace-strings ( builtins.concatStringsSep "" [ "\$( " ( builtins.toString value ) "/bin/structure )" "/" file-name ] ) }\"" ;
     structure-cat = value : file-name : name : "--run \"export ${ utils.upper-case name }=${ utils.replace-strings ( builtins.concatStringsSep "" [ "\$( " pkgs.coreutils "/bin/cat " "\$( " ( builtins.toString value ) "/bin/structure )" "/" file-name " )" ] ) }\"" ;
     utils = {
@@ -18,6 +19,7 @@
 		    if [ -f $out/src/${ name }.sh ]
 		    then
 		        chmod 0500 $out/src/${ name }.sh &&
+			    echo makeWrapper $out/src/${ name }.sh $out/bin/${ name } ${ builtins.concatStringsSep " " ( builtins.map ( name : ( builtins.getAttr name sets ) name ) ( builtins.attrNames sets ) ) } --run "export STORE_DIR=$out" --run "export PATH=${ pkgs.lib.makeBinPath dependencies }"
 			    makeWrapper $out/src/${ name }.sh $out/bin/${ name } ${ builtins.concatStringsSep " " ( builtins.map ( name : ( builtins.getAttr name sets ) name ) ( builtins.attrNames sets ) ) } --run "export STORE_DIR=$out" --run "export PATH=${ pkgs.lib.makeBinPath dependencies }"
 		    fi
 	    '' ;
@@ -42,7 +44,7 @@
 	} ;
         foo = name : uuid : utils.sh-derivation name { uuid = uuid ; } [ pkgs.coreutils ] ;
 	foobar = name : foo : utils.sh-derivation name { foo = foo ; } [ pkgs.coreutils ] ;
-	multiple-site-dot-ssh = name : configs : utils.sh-derivation name { } [ pkgs.coreutils ] ;
+	multiple-site-dot-ssh = name : configs : utils.sh-derivation name { configs = configs ; } [ pkgs.coreutils ] ;
 	pass = name : executable-name : dot-gnupg : password-store-dir : extensions : pkgs.stdenv.mkDerivation {
 	    name = name ;
 	    src = ./empty ;
