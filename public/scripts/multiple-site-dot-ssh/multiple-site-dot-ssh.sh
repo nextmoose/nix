@@ -2,7 +2,7 @@
 
 for CONFIG in "${@}"
 do
-    echo "Input ${CONFIG}" >> config &&
+    echo "Include ${CONFIG}" >> config &&
 	true
 done &&
     chmod 0400 config &&
