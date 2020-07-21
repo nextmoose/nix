@@ -1,0 +1,8 @@
+Host ${HOST}
+HostName ${HOST_NAME}
+User ${USER}
+Port ${PORT}
+IdentityFile ${IDENTITY_FILE}
+UserKnownHostsFile ${USER_KNOWN_HOSTS_FILE}
+ControlMaster auto
+ControlPath ${DOT_SSH}/%C.ctrl_path
