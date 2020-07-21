@@ -74,7 +74,7 @@
 	    name = name ;
 	    src = ./empty ;
 	    buildInputs = [ pkgs.makeWrapper ] ;
-	    installPhase = "makeWrapper ${ pkgs.openssh }/bin/ssh $out/bin/${ name } --addFlags \"-F ${ config "config" }\"" ;
+	    installPhase = "makeWrapper ${ pkgs.openssh }/bin/ssh $out/bin/${ name } ${ config "config" } --add-flags \"-F $CONFIG\"" ;
 	} ;
 	ssh-keygen = name : passphrase : utils.sh-derivation name { passphrase = passphrase ; } [ pkgs.openssh ] ;
 	structure = name : structures-dir : constructor-program : destructor : { cleaner-program ? "${ pkgs.coreutils }/bin/true" , salt-program ? "${ pkgs.coreutils }/bin/true" , seconds ? 60 * 60 } : utils.sh-derivation name { structures-dir = literal structures-dir ; constructor-program = literal constructor-program ; cleaner-program = literal cleaner-program ; salt-program = literal salt-program ; seconds = literal seconds ; destructor-program = literal "${ destructor }/bin/destructor" ; } [ pkgs.coreutils pkgs.utillinux ] ;
@@ -149,6 +149,7 @@ in {
 	    ( derivations.foobar ( structure-dir ( structures.foo ( literal "b2b48732-9547-4e14-bb8f-31fed11cc8d6" ) ) ) )
 	    ( derivations.post-commit ( literal "origin" ) )
 	    ( structures.multiple-site-dot-ssh ( structure-files [ ( structures.single-site-dot-ssh ( literal "upstream" ) ( literal "github.com" ) ( literal "git" ) ( literal 22 ) ( structure-file ( structures.ssh-keygen ( structure-cat ( structures.personal-identification-number ( literal "pin.asc" ) ( literal 6 ) ( literal "67b4e892-ef69-4253-9e21-459a1c33645a" ) ) "pin.asc" ) ) "id-rsa.asc" ) ( structure-file ( utils.system-secret "upstream.known_hosts" "known-hosts.asc" ) "known-hosts.asc" ) ) ] "config" ) )
+	    ( derivations.ssh ( structure-file ( structures.multiple-site-dot-ssh ( structure-files [ ( structures.single-site-dot-ssh ( literal "upstream" ) ( literal "github.com" ) ( literal "git" ) ( literal 22 ) ( structure-file ( structures.ssh-keygen ( structure-cat ( structures.personal-identification-number ( literal "pin.asc" ) ( literal 6 ) ( literal "67b4e892-ef69-4253-9e21-459a1c33645a" ) ) "pin.asc" ) ) "id-rsa.asc" ) ( structure-file ( utils.system-secret "upstream.known_hosts" "known-hosts.asc" ) "known-hosts.asc" ) ) ] "config" ) ) "config" ) )
 	    ( derivations.pass "system-secrets" ( structure-dir ( structures.dot-gnupg ( literal ./private/gpg-private-keys.asc ) ( literal ./private/gpg-ownertrust.asc ) ( literal ./private/gpg2-private-keys.asc ) ( literal ./private/gpg2-ownertrust.asc ) ) ) ( literal ( derivations.fetchFromGithub "nextmoose" "secrets" "7c044d920affadca7e66458a7560d8d40f9272ec" "1xnja2sc704v0qz94k9grh06aj296lmbgjl7vmwpvrgzg40bn25l" ) ) { kludge-pinentry = { program = "${ derivations.pass-kludge-pinentry }/bin/pass-kludge-pinentry" ; } ; } )
         ] ;
     } ;
