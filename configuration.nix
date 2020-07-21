@@ -74,7 +74,7 @@
 	    name = name ;
 	    src = ./empty ;
 	    buildInputs = [ pkgs.makeWrapper ] ;
-	    installPhase = "makeWrapper ${ pkgs.openssh }/bin/ssh $out/bin/${ name } ${ config "config" } --add-flags \"-F $CONFIG\"" ;
+	    installPhase = "makeWrapper ${ pkgs.openssh }/bin/ssh $out/bin/${ name } ${ config "config" } --add-flags \"-F \$CONFIG\"" ;
 	} ;
 	ssh-keygen = name : passphrase : utils.sh-derivation name { passphrase = passphrase ; } [ pkgs.openssh ] ;
 	structure = name : structures-dir : constructor-program : destructor : { cleaner-program ? "${ pkgs.coreutils }/bin/true" , salt-program ? "${ pkgs.coreutils }/bin/true" , seconds ? 60 * 60 } : utils.sh-derivation name { structures-dir = literal structures-dir ; constructor-program = literal constructor-program ; cleaner-program = literal cleaner-program ; salt-program = literal salt-program ; seconds = literal seconds ; destructor-program = literal "${ destructor }/bin/destructor" ; } [ pkgs.coreutils pkgs.utillinux ] ;
