@@ -7,7 +7,7 @@
     structure-dir = value : {
 	unlock = "${ pkgs.coreutils }/bin/true" ;
 	export = name : utils.export name "$( ${ value }/bin/structure )" ;
-	format = fun : fun "$( ${ value }/bin/structure )" ;
+	format = fun : fun "\$( ${ value }/bin/structure )" ;
     } ;
     structure-file = file-name : value : {
 	unlock = "${ pkgs.coreutils }/bin/true" ;
