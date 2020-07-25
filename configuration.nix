@@ -5,7 +5,7 @@
     } ;
     structure-dir = value : {
 	unlock = "${ pkgs.coreutils }/bin/true" ;
-	export = name : "--run \"export ${ utils.replace-strings "${ utils.upper-case name }=\"$( ${ builtins.toString value } )\"" }\"" ;
+	export = name : "--run \"export ${ utils.replace-strings "${ utils.upper-case name }=\"$( ${ builtins.toString value }/bin/structure )\"" }\"" ;
     } ;
     utils = {
         name-it = named : builtins.listToAttrs ( builtins.map ( name : { name = name ; value = builtins.getAttr name named name ; } ) ( builtins.attrNames named ) ) ;
