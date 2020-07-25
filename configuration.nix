@@ -7,6 +7,10 @@
 	unlock = "${ pkgs.coreutils }/bin/true" ;
 	export = name : "--run \"export ${ utils.replace-strings "${ utils.upper-case name }=\"$( ${ builtins.toString value }/bin/structure )\"" }\"" ;
     } ;
+    structure-file = file-name : value : {
+	unlock = "${ pkgs.coreutils }/bin/true" ;
+	export = name : "--run \"export ${ utils.replace-strings "${ utils.upper-case name }=\"$( ${ builtins.toString value }/bin/structure )/${ file-name }\"" }\"" ;
+    } ;
     utils = {
         name-it = named : builtins.listToAttrs ( builtins.map ( name : { name = name ; value = builtins.getAttr name named name ; } ) ( builtins.attrNames named ) ) ;
 	replace-strings = string : builtins.replaceStrings [ "\"" "\$" ] [ "\\\"" "\\\$" ] string ;
@@ -93,7 +97,7 @@ in {
 	    ( derivations.post-commit ( literal "origin" ) )
 	    derivations.rebuild-nixos
 	    ( derivations.foo ( literal "8ee9f204-e76f-4254-92fc-96ea94a0e88f" ) )
-	    ( derivations.foobar ( literal "6c63a1d6-a6f3-42b0-8b1e-8364e0b0b4bf" ) ( structure-dir ( structures.foo ( literal "REPLACE ME" ) ) ) ( literal "a9def3f0-0f27-454b-8dec-e172d885499d" ) ( literal "a756baa1-8c7c-4625-9d3a-a829a7560232" ) )
+	    ( derivations.foobar ( literal "6c63a1d6-a6f3-42b0-8b1e-8364e0b0b4bf" ) ( structure-dir ( structures.foo ( literal "1f5df803-dfa8-459a-aabd-916bda0a20c7" ) ) ) ( structure-file "uuid.txt" ( structures.foo ( literal "1f5df803-dfa8-459a-aabd-916bda0a20c7" ) ) ) ( literal "a756baa1-8c7c-4625-9d3a-a829a7560232" ) )
         ] ;
     } ;
 }
