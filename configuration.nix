@@ -60,10 +60,11 @@
 	pass = name : program-name : dot-gnupg : password-store-dir : extensions : pkgs.stdenv.mkDerivation {
 	    name = name ;
 	    src = ./public/empty ;
-	    buildInputs = [ pkgs.makeWrapper ] ;
+	    buildInputs = [ pkgs.gnused pkgs.makeWrapper ] ;
 	    installPhase = ''
 	        makeWrapper ${ pkgs.pass }/bin/pass $out/bin/${ program-name } ${ dot-gnupg.format ( dir : "--run \"export PASSWORD_STORE_GPG_OPTS=\\\"--homedir ${ dir }\\\"\"" ) } ${ password-store-dir.export "PASSWORD_STORE_DIR" } --run "export PASSWORD_STORE_ENABLE_EXTENSIONS=\"true\"" --run "export PASSWORD_STORE_EXTENSIONS_DIR=\"$out/extensions\""
 		${ builtins.concatStringsSep "\n" ( builtins.map ( name : "makeWrapper ${ ( builtins.getAttr name extensions ).program } $out/extensions/${ name }.bash" ) ( builtins.attrNames extensions ) ) }
+		sed -e "s#_pass#_pass_$( basename $out )#g" -e "s# pass#${ program-name }#g" -e "s#PASSWORD_STORE_DIR:-\$HOME/[.]password-store/#${ password-store-dir.format ( dir : dir ) }#" -e "w$out/completions.sh" ${ pkgs.pass }/share/bash-completion/completions/pass
 	    '' ;
 	} ;
 	pass-kludge-pinentry = name : utils.sh-derivation name { } [ pkgs.coreutils pkgs.gnupg ] ;
