@@ -93,7 +93,7 @@ in {
 	    ( derivations.post-commit ( literal "origin" ) )
 	    derivations.rebuild-nixos
 	    ( derivations.foo ( literal "8ee9f204-e76f-4254-92fc-96ea94a0e88f" ) )
-	    ( derivations.foobar ( literal "6c63a1d6-a6f3-42b0-8b1e-8364e0b0b4bf" ) ( literal "abb0260b-ed4a-43f3-8a7e-021fe976ed07" ) ( literal "a9def3f0-0f27-454b-8dec-e172d885499d" ) ( literal "a756baa1-8c7c-4625-9d3a-a829a7560232" ) )
+	    ( derivations.foobar ( literal "6c63a1d6-a6f3-42b0-8b1e-8364e0b0b4bf" ) ( literal "REPLACE ME" ) ( literal "a9def3f0-0f27-454b-8dec-e172d885499d" ) ( literal "a756baa1-8c7c-4625-9d3a-a829a7560232" ) )
         ] ;
     } ;
 }
