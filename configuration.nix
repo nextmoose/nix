@@ -72,7 +72,7 @@
 
 source $out/pass-completions.sh
 PASSWORD_STORE_EXTENSION_COMMANDS=( ${ builtins.concatStringsSep " " ( builtins.attrNames extensions ) } )
-
+${ builtins.concatStringsSep "\n" ( builtins.map ( name : "source $out/completions/${ name }.sh\"" ) ( builtins.filter ( name : builtins.hasAttr "completion" ( builtins.getAttr name extensions ) ) ( builtins.attrNames extensions ) ) ) }
 EOF
 		)
 	    '' ;
