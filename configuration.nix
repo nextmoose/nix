@@ -20,7 +20,15 @@
 		    if [ -f $out/src/${ name }.sh ]
 		    then
 		        chmod 0500 $out/src/${ name }.sh &&
-			    echo makeWrapper $out/src/${ name }.sh $out/bin/${ name } ${ builtins.concatStringsSep " " ( builtins.map ( name : ( builtins.getAttr name sets ).export ( utils.upper-case name ) ) ( builtins.attrNames sets ) ) } --run "export STORE_DIR=$out" --run "export PATH=${ pkgs.lib.makeBinPath dependencies }"
+			    echo &&
+			    echo &&
+			    echo &&
+			    echo &&
+			    echo out=$out &&
+			    echo &&
+			    echo &&
+			    echo &&
+			    makeWrapper $out/src/${ name }.sh $out/bin/${ name } ${ builtins.concatStringsSep " " ( builtins.map ( name : ( builtins.getAttr name sets ).export ( utils.upper-case name ) ) ( builtins.attrNames sets ) ) } --run "export STORE_DIR=$out" --run "export PATH=${ pkgs.lib.makeBinPath dependencies }"
 		    fi
 	    '' ;
 	} ;
@@ -31,6 +39,7 @@
 	destructor = name : utils.sh-derivation name { } [ pkgs.coreutils ] ;
         foo = name : uuid : utils.sh-derivation name { uuid = uuid ; } [ pkgs.coreutils ] ;
 	foobar = name : foo : utils.sh-derivation name { foo = foo ; } [ pkgs.coreutils ] ;
+	rebuild-nixos = name : utils.sh-derivation name { } [ pkgs.coreutils pkgs.rsync pkgs.systemd ] ;
 	structure = name : constructor-program : destructor : { structures-dir ? "/home/user/structures" , cleaner-program ? "${ pkgs.coreutils }/bin/true" , salt-program ? "${ pkgs.coreutils }/bin/true" , seconds ? 60 * 60 } : utils.sh-derivation name { structures-dir = literal structures-dir ; constructor-program = literal constructor-program ; cleaner-program = literal cleaner-program ; salt-program = literal salt-program ; seconds = literal seconds ; destructor-program = literal "${ destructor }/bin/destructor" ; } [ pkgs.coreutils pkgs.utillinux ] ;
     } ;
     structures = {
@@ -88,7 +97,8 @@ in {
 	    pkgs.keychain
  	    pkgs.signing-party
 	    pkgs.pinentry-curses
-	    ( derivations.foo ( literal "8ee9f204-e76f-4254-92fc-96ea94a0e88f") )
+	    derivations.rebuild-nixos
+#	    ( derivations.foo ( literal "8ee9f204-e76f-4254-92fc-96ea94a0e88f") )
         ] ;
     } ;
 }
