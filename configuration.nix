@@ -1,7 +1,7 @@
 { config, pkgs, ... } : let
     literal = value : {
 	unlock = "${ pkgs.coreutils }/bin/true" ;
-	export = name : "--run \"export ${ utils.replace-strings "${ utils.upper-case name }=\"${ builtins.toString value }\"" }\"" ;
+	export = name : utils.export name value ;
     } ;
     structure-dir = value : {
 	unlock = "${ pkgs.coreutils }/bin/true" ;
@@ -16,6 +16,7 @@
 	export = name : "--run \"export ${ utils.replace-strings "${ utils.upper-case name }=\"$( ${ pkgs.coreutils }/bin/cat $( ${ builtins.toString value }/bin/structure )/${ file-name } )\"" }\"" ;
     } ;
     utils = {
+        export = name : value : "--run ${ utils.replace-strings "\\\"export ${ utils.upper-case name }=${ builtins.toString value }\\\"" }" ;
         name-it = named : builtins.listToAttrs ( builtins.map ( name : { name = name ; value = builtins.getAttr name named name ; } ) ( builtins.attrNames named ) ) ;
 	replace-strings = string : builtins.replaceStrings [ "\"" "\$" ] [ "\\\"" "\\\$" ] string ;
         sh-derivation = name : sets : dependencies : pkgs.stdenv.mkDerivation {
