@@ -44,9 +44,9 @@
     derivations = utils.name-it {
 	destructor = name : utils.sh-derivation name { } [ pkgs.coreutils ] ;
 	dot-gnupg = name : gpg-private-keys : gpg-ownertrust : gpg2-private-keys : gpg2-ownertrust : utils.sh-derivation name { gpg-private-keys = gpg-private-keys ; gpg-ownertrust = gpg-ownertrust ; gpg2-private-keys = gpg2-private-keys ; gpg2-ownertrust = gpg2-ownertrust ; } [ pkgs.coreutils pkgs.gnupg ] ;
-	fetchFromGithub = name : owner : repo : rev : sha256 : utils.sh-derivation {
+	fetchFromGitHub = name : owner : repo : rev : sha256 : pkgs.stdenv.mkDerivation {
 	    name = name ;
-	    src = pkgs.fetchFromGithub {
+	    src = pkgs.fetchFromGitHub {
 	        owner = owner ;
 		repo = repo ;
 		rev = rev ;
@@ -127,10 +127,11 @@ in {
 	    pkgs.pinentry-curses
 	    ( derivations.post-commit ( literal "origin" ) )
 	    derivations.rebuild-nixos
+	    ( derivations.fetchFromGitHub "nextmoose" "secrets" "7c044d920affadca7e66458a7560d8d40f9272ec" "1xnja2sc704v0qz94k9grh06aj296lmbgjl7vmwpvrgzg40bn25l" )
 	    ( derivations.foo ( literal "8ee9f204-e76f-4254-92fc-96ea94a0e88f" ) )
 	    ( derivations.foobar ( literal "6c63a1d6-a6f3-42b0-8b1e-8364e0b0b4bf" ) ( structure-dir ( structures.foo ( literal "1f5df803-dfa8-459a-aabd-916bda0a20c7" ) ) ) ( structure-file "uuid.txt" ( structures.foo ( literal "1f5df803-dfa8-459a-aabd-916bda0a20c7" ) ) ) ( structure-cat "uuid.txt" ( structures.foo ( literal "1f5df803-dfa8-459a-aabd-916bda0a20c7" ) ) ) )
- 	    ( derivations.pass "syste-secrets" ( structure-dir ( structures.dot-gnupg ( literal ./private/gpg-private-keys.asc ) ( literal ./private/gpg-ownertrust.asc ) ( literal ./private/gpg2-private-keys.asc ) ( literal ./private/gpg2-ownertrust.asc ) ) ) ( literal ( derivations.fetchFromGithub "nextmoose" "secrets.git" "7c044d920affadca7e66458a7560d8d40f9272ec" utils.helloworldsha256 ) ) { } )
-#	    ( derivations.pass "system-secrets" ( structure-dir ( structures.dot-gnupg ( literal ./private/gpg-private-keys.asc ) ( literal ./private/gpg-ownertrust.asc ) ( literal ./private/gpg2-private-keys.asc ) ( literal ./private/gpg2-ownertrust.asc ) ) ) ( literal ( derivations.fetchFromGithub "nextmoose" "secrets.git" "7c044d920affadca7e66458a7560d8d40f9272ec" utils.helloworldsha256 ) ) { } )
+# 	    ( derivations.pass "system-secrets" ( structure-dir ( structures.dot-gnupg ( literal ./private/gpg-private-keys.asc ) ( literal ./private/gpg-ownertrust.asc ) ( literal ./private/gpg2-private-keys.asc ) ( literal ./private/gpg2-ownertrust.asc ) ) ) ( literal ( derivations.fetchFromGitHub "nextmoose" "secrets.git" "7c044d920affadca7e66458a7560d8d40f9272ec" utils.helloworldsha256 ) ) { } )
+#	    ( derivations.pass "system-secrets" ( structure-dir ( structures.dot-gnupg ( literal ./private/gpg-private-keys.asc ) ( literal ./private/gpg-ownertrust.asc ) ( literal ./private/gpg2-private-keys.asc ) ( literal ./private/gpg2-ownertrust.asc ) ) ) ( literal ( derivations.fetchFromGitHub "nextmoose" "secrets.git" "7c044d920affadca7e66458a7560d8d40f9272ec" utils.helloworldsha256 ) ) { } )
         ] ;
     } ;
 }
