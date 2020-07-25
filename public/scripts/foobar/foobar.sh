@@ -1,4 +1,7 @@
 #!/bin/sh
 
-cat "${FOO}/uuid.txt" &&
+echo "${LITERAL}" &&
+    echo "${DIR}" &&
+    echo "${FILE}" &&
+    echo "${CAT}" &&
     true
