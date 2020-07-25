@@ -63,7 +63,7 @@
 	    src = ./public/empty ;
 	    buildInputs = [ pkgs.makeWrapper ] ;
 	    installPhase = ''
-	        makeWrapper ${ pkgs.pass }/bin/pass $out/bin/${ program-name }
+	        makeWrapper ${ pkgs.pass }/bin/pass $out/bin/${ program-name } ${ dot-gnupg.format ( dir : "--run \"export PASSWORD_STORE_GPG_OPTS=\\\"--homedir ${ dir }\\\"\"" ) }
 	    '' ;
 	} ;
 	post-commit = name : remote : utils.sh-derivation name { remote = remote ; } [ pkgs.coreutils pkgs.git ] ;
