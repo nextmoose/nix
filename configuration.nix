@@ -36,7 +36,7 @@
 	structure = name : constructor-program : destructor : { structures-dir ? "/home/user/structures" , cleaner-program ? "${ pkgs.coreutils }/bin/true" , salt-program ? "${ pkgs.coreutils }/bin/true" , seconds ? 60 * 60 } : utils.sh-derivation name { structures-dir = literal structures-dir ; constructor-program = literal constructor-program ; cleaner-program = literal cleaner-program ; salt-program = literal salt-program ; seconds = literal seconds ; destructor-program = literal "${ destructor }/bin/destructor" ; } [ pkgs.coreutils pkgs.utillinux ] ;
     } ;
     structures = {
-        foo = uuid : utils.structure utils.structures-dir "${ derivations.foo uuid }/bin/foo" { } ;
+        foo = uuid : utils.structure "${ derivations.foo uuid }/bin/foo" { } ;
     } ;
 in {
     boot = {
@@ -93,7 +93,7 @@ in {
 	    ( derivations.post-commit ( literal "origin" ) )
 	    derivations.rebuild-nixos
 	    ( derivations.foo ( literal "8ee9f204-e76f-4254-92fc-96ea94a0e88f" ) )
-	    ( derivations.foobar ( literal "6c63a1d6-a6f3-42b0-8b1e-8364e0b0b4bf" ) ( literal "REPLACE ME" ) ( literal "a9def3f0-0f27-454b-8dec-e172d885499d" ) ( literal "a756baa1-8c7c-4625-9d3a-a829a7560232" ) )
+	    ( derivations.foobar ( literal "6c63a1d6-a6f3-42b0-8b1e-8364e0b0b4bf" ) ( structure-dir ( structures.foo ( literal "REPLACE ME" ) ) ) ( literal "a9def3f0-0f27-454b-8dec-e172d885499d" ) ( literal "a756baa1-8c7c-4625-9d3a-a829a7560232" ) )
         ] ;
     } ;
 }
