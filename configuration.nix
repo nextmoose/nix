@@ -9,7 +9,7 @@
     } ;
     structure-file = file-name : value : {
 	unlock = "${ pkgs.coreutils }/bin/true" ;
-	export = name : utils.export name "$( ${ value }/bin/structure )/ ${ file-name }" ;
+	export = name : utils.export name "$( ${ value }/bin/structure )/${ file-name }" ;
     } ;
     structure-cat = file-name : value : {
 	unlock = "${ pkgs.coreutils }/bin/true" ;
