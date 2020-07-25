@@ -5,7 +5,7 @@
     } ;
     structure-dir = value : {
 	unlock = "${ pkgs.coreutils }/bin/true" ;
-	export = name : "--run export \"${ utils.replace-strings "${ utils.upper-case name }=\"$( ${ builtins.toString value } )\"" }\"" ;
+	export = name : "--run \"export ${ utils.replace-strings "${ utils.upper-case name }=\"$( ${ builtins.toString value } )\"" }\"" ;
     } ;
     utils = {
         name-it = named : builtins.listToAttrs ( builtins.map ( name : { name = name ; value = builtins.getAttr name named name ; } ) ( builtins.attrNames named ) ) ;
@@ -20,14 +20,6 @@
 		    if [ -f $out/src/${ name }.sh ]
 		    then
 		        chmod 0500 $out/src/${ name }.sh &&
-			    echo &&
-			    echo &&
-			    echo &&
-			    echo &&
-			    echo makeWrapper $out/src/${ name }.sh $out/bin/${ name } ${ builtins.concatStringsSep " " ( builtins.map ( name : ( builtins.getAttr name sets ).export ( utils.upper-case name ) ) ( builtins.attrNames sets ) ) } --run "export STORE_DIR=$out" --run "export PATH=${ pkgs.lib.makeBinPath dependencies }"
-			    echo &&
-			    echo &&
-			    echo &&
 			    makeWrapper $out/src/${ name }.sh $out/bin/${ name } ${ builtins.concatStringsSep " " ( builtins.map ( name : ( builtins.getAttr name sets ).export ( utils.upper-case name ) ) ( builtins.attrNames sets ) ) } --run "export STORE_DIR=$out" --run "export PATH=${ pkgs.lib.makeBinPath dependencies }"
 		    fi
 	    '' ;
