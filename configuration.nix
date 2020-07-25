@@ -75,7 +75,7 @@
 	    src = ./public/empty ;
 	    buildInputs = [ pkgs.makeWrapper ] ;
 	    installPhase = ''
-	        makeWrapper ${ pkgs.nix }/bin/nix-shell $out/shellx
+	        makeWrapper ${ pkgs.nix }/bin/nix-shell $out/bin/shellx
 	    '' ;
 	} ;
 	structure = name : constructor-program : destructor : { structures-dir ? "/home/user/structures" , cleaner-program ? "${ pkgs.coreutils }/bin/true" , salt-program ? "${ pkgs.coreutils }/bin/true" , seconds ? 60 * 60 } : utils.sh-derivation name { structures-dir = literal structures-dir ; constructor-program = literal constructor-program ; cleaner-program = literal cleaner-program ; salt-program = literal salt-program ; seconds = literal seconds ; destructor-program = literal "${ destructor }/bin/destructor" ; } [ pkgs.coreutils pkgs.utillinux ] ;
