@@ -70,12 +70,12 @@
 	pass-kludge-pinentry = name : utils.sh-derivation name { } [ pkgs.coreutils pkgs.gnupg ] ;
 	post-commit = name : remote : utils.sh-derivation name { remote = remote ; } [ pkgs.coreutils pkgs.git ] ;
 	rebuild-nixos = name : utils.sh-derivation name { } [ pkgs.coreutils pkgs.gnugrep pkgs.rsync pkgs.systemd ] ;
-	shell = name : path : pkgs.stdenv.mkDerivation {
+	shell = name : program-name : path : pkgs.stdenv.mkDerivation {
 	    name = name ;
 	    src = ./public/empty ;
 	    buildInputs = [ pkgs.makeWrapper ] ;
 	    installPhase = ''
-	        makeWrapper ${ pkgs.nix }/bin/nix-shell $out/bin/shellx
+	        makeWrapper ${ pkgs.nix }/bin/nix-shell $out/bin/${ program-name } --add-flags ${ path.format ( dir : dir ) }
 	    '' ;
 	} ;
 	structure = name : constructor-program : destructor : { structures-dir ? "/home/user/structures" , cleaner-program ? "${ pkgs.coreutils }/bin/true" , salt-program ? "${ pkgs.coreutils }/bin/true" , seconds ? 60 * 60 } : utils.sh-derivation name { structures-dir = literal structures-dir ; constructor-program = literal constructor-program ; cleaner-program = literal cleaner-program ; salt-program = literal salt-program ; seconds = literal seconds ; destructor-program = literal "${ destructor }/bin/destructor" ; } [ pkgs.coreutils pkgs.utillinux ] ;
@@ -136,7 +136,7 @@ in {
 	    pkgs.keychain
  	    pkgs.signing-party
 	    pkgs.pinentry-curses
-	    ( derivations.shell "pkgs.firefox" )
+	    ( derivations.shell "standard-shell" ( literal ./public/shells/standard ) )
 	    ( derivations.post-commit ( literal "origin" ) )
 	    derivations.rebuild-nixos
 	    ( derivations.foo ( literal "8ee9f204-e76f-4254-92fc-96ea94a0e88f" ) )
