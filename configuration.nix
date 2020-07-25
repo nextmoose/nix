@@ -1,7 +1,7 @@
 { config, pkgs, ... } : let
     literal = value : {
 	unlock = "${ pkgs.coreutils }/bin/true" ;
-	export = name : "--run \"export ${ utils.replace-strings "${ utils.upper-case name }=${ builtins.toString value }" }\"" ;
+	export = name : "--run \"export ${ utils.replace-strings "${ utils.upper-case name }=\"${ builtins.toString value }\"" }\"" ;
     } ;
     structure-dir = value : {
 	unlock = "${ pkgs.coreutils }/bin/true" ;
