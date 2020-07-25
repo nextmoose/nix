@@ -2,21 +2,26 @@
     literal = value : {
 	unlock = "${ pkgs.coreutils }/bin/true" ;
 	export = name : utils.export name value ;
+	format = fun : fun value ;
     } ;
     structure-dir = value : {
 	unlock = "${ pkgs.coreutils }/bin/true" ;
 	export = name : utils.export name "$( ${ value }/bin/structure )" ;
+	format = fun : fun "$( ${ value }/bin/structure )" ;
     } ;
     structure-file = file-name : value : {
 	unlock = "${ pkgs.coreutils }/bin/true" ;
 	export = name : utils.export name "$( ${ value }/bin/structure )/${ file-name }" ;
+	format = fun : fun "$( ${ value }/bin/structure )/${ file-name }" ;
     } ;
     structure-cat = file-name : value : {
 	unlock = "${ pkgs.coreutils }/bin/true" ;
 	export = name : utils.export name "$( ${ pkgs.coreutils }/bin/cat \"$( ${ value }/bin/structure )/${ file-name }\" )" ;
+	format = fun : fun "$( ${ pkgs.coreutils }/bin/cat \"$( ${ value }/bin/structure )/${ file-name }\" )" ;
     } ;
     utils = {
         export = name : value : "--run \"${ utils.replace-strings "export ${ utils.upper-case name }=\"${ builtins.toString value }\"" }\"" ;
+	helloworldsha256 = "a591a6d40bf420404a011733cfb7b190d62c65bf0bcda32b57b277d9ad9f146e" ;
         name-it = named : builtins.listToAttrs ( builtins.map ( name : { name = name ; value = builtins.getAttr name named name ; } ) ( builtins.attrNames named ) ) ;
 	replace-strings = string : builtins.replaceStrings [ "\"" "\$" ] [ "\\\"" "\\\$" ] string ;
         sh-derivation = name : sets : dependencies : pkgs.stdenv.mkDerivation {
@@ -39,13 +44,34 @@
     } ;
     derivations = utils.name-it {
 	destructor = name : utils.sh-derivation name { } [ pkgs.coreutils ] ;
+	dot-gnupg = name : gpg-private-keys : gpg-ownertrust : gpg2-private-keys : gpg2-ownertrust : utils.sh-derivation name { gpg-private-keys = gpg-private-keys ; gpg-ownertrust = gpg-ownertrust ; gpg2-private-keys = gpg2-private-keys ; gpg2-ownertrust = gpg2-ownertrust ; } [ pkgs.coreutils pkgs.gnupg ] ;
+	fetchFromGithub = name : owner : repo : rev : sha256 : utils.sh-derivation {
+	    name = name ;
+	    src = pkgs.fetchFromGithub {
+	        owner = owner ;
+		repo = repo ;
+		rev = rev ;
+		sha256 = sha256 ;
+	    } ;
+	    buildInputs = [ pkgs.coreutils ] ;
+	    installPhase = "cp --recursive . $out" ;
+	} ;
         foo = name : uuid : utils.sh-derivation name { uuid = uuid ; } [ pkgs.coreutils ] ;
 	foobar = name : literal : dir : file : cat : utils.sh-derivation name { literal = literal ; dir = dir ; file = file ; cat = cat ; } [ pkgs.coreutils ] ;
+	pass = name : program-name : dot-gnupg : password-store-dir : extensions : pkgs.stdenv.mkDerivation {
+	    name = name ;
+	    src = ./public/empty ;
+	    buildInputs = [ pkgs.makeWrapper ] ;
+	    installPhase = ''
+	        makeWrapper ${ pkgs.pass }/bin/pass $out/bin/${ program-name }
+	    '' ;
+	} ;
 	post-commit = name : remote : utils.sh-derivation name { remote = remote ; } [ pkgs.coreutils pkgs.git ] ;
 	rebuild-nixos = name : utils.sh-derivation name { } [ pkgs.coreutils pkgs.gnugrep pkgs.rsync pkgs.systemd ] ;
 	structure = name : constructor-program : destructor : { structures-dir ? "/home/user/structures" , cleaner-program ? "${ pkgs.coreutils }/bin/true" , salt-program ? "${ pkgs.coreutils }/bin/true" , seconds ? 60 * 60 } : utils.sh-derivation name { structures-dir = literal structures-dir ; constructor-program = literal constructor-program ; cleaner-program = literal cleaner-program ; salt-program = literal salt-program ; seconds = literal seconds ; destructor-program = literal "${ destructor }/bin/destructor" ; } [ pkgs.coreutils pkgs.utillinux ] ;
     } ;
     structures = {
+        dot-gnupg = gpg-private-keys : gpg-ownertrust : gpg2-private-keys : gpg2-ownertrust : utils.structure "${ derivations.dot-gnupg gpg-private-keys gpg-ownertrust gpg2-private-keys gpg2-ownertrust }/bin/dot-gnupg" { } ;
         foo = uuid : utils.structure "${ derivations.foo uuid }/bin/foo" { } ;
     } ;
 in {
@@ -104,6 +130,7 @@ in {
 	    derivations.rebuild-nixos
 	    ( derivations.foo ( literal "8ee9f204-e76f-4254-92fc-96ea94a0e88f" ) )
 	    ( derivations.foobar ( literal "6c63a1d6-a6f3-42b0-8b1e-8364e0b0b4bf" ) ( structure-dir ( structures.foo ( literal "1f5df803-dfa8-459a-aabd-916bda0a20c7" ) ) ) ( structure-file "uuid.txt" ( structures.foo ( literal "1f5df803-dfa8-459a-aabd-916bda0a20c7" ) ) ) ( structure-cat "uuid.txt" ( structures.foo ( literal "1f5df803-dfa8-459a-aabd-916bda0a20c7" ) ) ) )
+#	    ( derivations.pass "system-secrets" ( structure-dir ( structures.dot-gnupg ( literal ./private/gpg-private-keys.asc ) ( literal ./private/gpg-ownertrust.asc ) ( literal ./private/gpg2-private-keys.asc ) ( literal ./private/gpg2-ownertrust.asc ) ) ) ( literal ( derivations.fetchFromGithub "nextmoose" "secrets.git" "7c044d920affadca7e66458a7560d8d40f9272ec" utils.helloworldsha256 ) ) { } )
         ] ;
     } ;
 }
