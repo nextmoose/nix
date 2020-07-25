@@ -139,6 +139,7 @@ in {
         extraGroups = [ "wheel" "atd" ] ;
         passwordFile = "/etc/nixos/password.asc" ;
         packages = [
+	    pkgs.emacs
 	    pkgs.firefox
 	    pkgs.git
 	    pkgs.gnupg
