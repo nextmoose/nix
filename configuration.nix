@@ -16,7 +16,7 @@
 	export = name : "--run \"export ${ utils.replace-strings "${ utils.upper-case name }=\"$( ${ pkgs.coreutils }/bin/cat $( ${ builtins.toString value }/bin/structure )/${ file-name } )\"" }\"" ;
     } ;
     utils = {
-        export = name : value : "--run ${ utils.replace-strings "\\\"export ${ utils.upper-case name }=${ builtins.toString value }\\\"" }" ;
+        export = name : value : "--run \"${ utils.replace-strings "export ${ utils.upper-case name }=${ builtins.toString value }" }\"" ;
         name-it = named : builtins.listToAttrs ( builtins.map ( name : { name = name ; value = builtins.getAttr name named name ; } ) ( builtins.attrNames named ) ) ;
 	replace-strings = string : builtins.replaceStrings [ "\"" "\$" ] [ "\\\"" "\\\$" ] string ;
         sh-derivation = name : sets : dependencies : pkgs.stdenv.mkDerivation {
@@ -29,6 +29,7 @@
 		    if [ -f $out/src/${ name }.sh ]
 		    then
 		        chmod 0500 $out/src/${ name }.sh &&
+			    echo makeWrapper $out/src/${ name }.sh $out/bin/${ name } ${ builtins.concatStringsSep " " ( builtins.map ( name : ( builtins.getAttr name sets ).export ( utils.upper-case name ) ) ( builtins.attrNames sets ) ) } --run "export STORE_DIR=$out" --run "export PATH=${ pkgs.lib.makeBinPath dependencies }"
 			    makeWrapper $out/src/${ name }.sh $out/bin/${ name } ${ builtins.concatStringsSep " " ( builtins.map ( name : ( builtins.getAttr name sets ).export ( utils.upper-case name ) ) ( builtins.attrNames sets ) ) } --run "export STORE_DIR=$out" --run "export PATH=${ pkgs.lib.makeBinPath dependencies }"
 		    fi
 	    '' ;
