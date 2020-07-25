@@ -66,7 +66,7 @@
 		${ builtins.concatStringsSep "\n" ( builtins.map ( name : "makeWrapper ${ ( builtins.getAttr name extensions ).program } $out/extensions/${ name }.bash" ) ( builtins.attrNames extensions ) ) }
 		sed -e "s#_pass#_pass_$( basename $out )#g" -e "s# pass# ${ program-name }#g" -e "s#.{PASSWORD_STORE_DIR:-\$HOME/[.]password-store/}#${ password-store-dir.format ( dir : dir ) }#" -e "w$out/pass-completions.sh" ${ pkgs.pass }/share/bash-completion/completions/pass
 		mkdir $out/completions
-		${ builtins.concatStringsSep "\n" ( builtins.map ( name : "sed -e \"s#OUT#$( basename $out )#g\" -e \"s#COMMAND#${ name }#g\" -e \"w$out/completions/${ name }.sh\" ${ ( builtins.getAttr name extensions ).completion }" ) ( builtins.filter ( name : builtins.hasAttr "completion" ( builtins.getAttr name extensions ) ) ( builtins.attrNames extensions ) ) ) }
+		${ builtins.concatStringsSep "\n" ( builtins.map ( name : "sed -e \"s#_pass#_pass_$( basename $out )#g\" -e \"s#COMMAND#${ name }#g\" -e \"w$out/completions/${ name }.sh\" ${ ( builtins.getAttr name extensions ).completion }" ) ( builtins.filter ( name : builtins.hasAttr "completion" ( builtins.getAttr name extensions ) ) ( builtins.attrNames extensions ) ) ) }
 		( cat > $out/completions.sh <<EOF
 #!/bin/sh
 
