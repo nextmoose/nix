@@ -5,12 +5,11 @@
     } ;
     structure-dir = value : {
 	unlock = "${ pkgs.coreutils }/bin/true" ;
-#	export = name : "--run \"export ${ utils.replace-strings "${ utils.upper-case name }=\"$( ${ builtins.toString value }/bin/structure )\"" }\"" ;
 	export = name : utils.export name "$( ${ value }/bin/structure )" ;
     } ;
     structure-file = file-name : value : {
 	unlock = "${ pkgs.coreutils }/bin/true" ;
-	export = name : "--run \"export ${ utils.replace-strings "${ utils.upper-case name }=\"$( ${ builtins.toString value }/bin/structure )/${ file-name }\"" }\"" ;
+	export = name : utils.export name "$( ${ value }/bin/structure )/ ${ file-name }" ;
     } ;
     structure-cat = file-name : value : {
 	unlock = "${ pkgs.coreutils }/bin/true" ;
