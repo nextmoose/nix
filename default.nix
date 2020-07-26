@@ -65,7 +65,7 @@
 	        mkdir $out &&
 		    cp --recursive . $out/src &&
 		    chmod 0500 $out/src/multiple-site-dot-ssh.sh &&
-		    makeWrapper $out/src/multiple-site-dot-ssh.sh $out/bin/multiple-site-dot-ssh
+		    makeWrapper $out/src/multiple-site-dot-ssh.sh $out/bin/multiple-site-dot-ssh --addFlags ${ configs.format ( file : file ) }
 	    '' ;
 	} ;
 	pass = name : program-name : dot-gnupg : password-store-dir : extensions : pkgs.stdenv.mkDerivation {
@@ -176,7 +176,7 @@ in {
         } ;
     } ;
     shell = let
-        dot-ssh = structures.multiple-site-dot-ssh [ ( structure-file ( literal "config" ) upstream-dot-ssh ) ( structure-file ( literal "config" ) personal-dot-ssh ) ( structure-file ( literal "config" ) report-dot-ssh ) ] ;
+        dot-ssh = structures.multiple-site-dot-ssh ( structure-file ( literal "config" ) upstream-dot-ssh ) ;
 	personal-dot-ssh = structures.single-site-dot-ssh ( literal "personal" ) ( literal "github.com" ) ( literal "git" ) ( literal 22 ) ( structure-file "id-rsa" personal-id-rsa ) ( structure-file "secret.asc" user-known-hosts-file ) ;
         personal-id-rsa = structures.ssh-keygen ( structure-dir ( structures.personal-identification-number ( literal 0 ) ( literal "a6104037-4036-4cde-8b10-a8de9f6e3145" ) ) ) ;
 	report-dot-ssh = structures.single-site-dot-ssh ( literal "report" ) ( literal "github.com" ) ( literal "git" ) ( literal 22 ) ( structure-file "id-rsa" report-id-rsa ) ( structure-file "secret.asc" user-known-hosts-file ) ;
