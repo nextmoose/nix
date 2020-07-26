@@ -6,7 +6,7 @@ echo "${UUID}" &&
 	touch pin.asc &&
 	    true
     else
-	cat /dev/urandom | tr --delete --complement "0-9" | fold --width "${DIGITS}" | head --lines 1 > "${FILE_NAME}" &&
+	cat /dev/urandom | tr --delete --complement "0-9" | fold --width "${DIGITS}" | head --lines 1 > pin.asc &&
 	    true
     fi &&
     chmod 0400 pin.asc &&
