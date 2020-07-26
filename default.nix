@@ -176,7 +176,7 @@ in {
 	    export REPORT_PIN=$( ${ pkgs.coreutils }/bin/cat $( ${ report-pin }/bin/structure )/pin.asc ) &&
 	        source ${ system-secrets }/completions.sh &&
 	        ${ system-secrets }/bin/system-secrets kludge-pinentry uuid
-		${ pkgs.coreutils }/bin/echo ${ user-known-hosts-file }
+		${ pkgs.coreutils }/bin/echo ${ personal-dot-ssh }
 	'' ;
 	buildInputs = [
 	    system-secrets
