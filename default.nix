@@ -12,7 +12,7 @@
     structure-file = file-name : value : {
 	unlock = "${ pkgs.coreutils }/bin/true" ;
 	export = name : utils.export name "$( ${ value }/bin/structure )/${ file-name }" ;
-	format = fun : fun "$( ${ builtins.toString value }/bin/structure )/${ file-name }" ;
+	format = fun : fun "$( \\\${ value }/bin/structure )/${ file-name }" ;
     } ;
     structure-cat = file-name : value : {
 	unlock = "${ pkgs.coreutils }/bin/true" ;
