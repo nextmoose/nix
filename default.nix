@@ -34,7 +34,7 @@
 		    if [ -f $out/src/${ name }.sh ]
 		    then
 		        chmod 0500 $out/src/${ name }.sh &&
-			    makeWrapper $out/src/${ name }.sh $out/bin/${ name } ${ builtins.concatStringsSep " " ( builtins.map ( name : ( builtins.getAttr name sets ).export ( utils.upper-case name ) ) ( builtins.attrNames sets ) ) } --run "export STORE_DIR=$out" --run "export PATH=${ pkgs.lib.makeBinPath dependencies }" --add-flags "${ builtins.concatStringsSep " " ( builtins.map ( arg : builtins.typeOf arg.format ) args ) }"
+			    makeWrapper $out/src/${ name }.sh $out/bin/${ name } ${ builtins.concatStringsSep " " ( builtins.map ( name : ( builtins.getAttr name sets ).export ( utils.upper-case name ) ) ( builtins.attrNames sets ) ) } --run "export STORE_DIR=$out" --run "export PATH=${ pkgs.lib.makeBinPath dependencies }" --add-flags "${ builtins.concatStringsSep " " ( builtins.map ( arg : arg.format ( x : x ) ) args ) }"
 		    fi
 	    '' ;
 	} ;
