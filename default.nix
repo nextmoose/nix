@@ -80,12 +80,12 @@ EOF
 	pass-kludge-pinentry = name : utils.sh-derivation name { } [ pkgs.coreutils pkgs.gnupg ] ;
 	post-commit = name : remote : utils.sh-derivation name { remote = remote ; } [ pkgs.coreutils pkgs.git ] ;
 	rebuild-nixos = name : utils.sh-derivation name { } [ pkgs.coreutils pkgs.gnugrep pkgs.rsync pkgs.systemd ] ;
-	shell = name : program-name : path : pkgs.stdenv.mkDerivation {
+	shell = name : attribute-name : pkgs.stdenv.mkDerivation {
 	    name = name ;
 	    src = ./public/empty ;
 	    buildInputs = [ pkgs.makeWrapper ] ;
 	    installPhase = ''
-	        makeWrapper ${ pkgs.nix }/bin/nix-shell $out/bin/${ program-name } --add-flags ${ path.format ( dir : dir ) }
+	        makeWrapper ${ pkgs.nix }/bin/nix-shell $out/bin/${ attribute-name } --add-flags "./default.nix --attr ${ attribute-name }"
 	    '' ;
 	} ;
 	structure = name : constructor-program : destructor : { structures-dir ? "/home/user/.structures" , cleaner-program ? "${ pkgs.coreutils }/bin/true" , salt-program ? "${ pkgs.coreutils }/bin/true" , seconds ? 60 * 60 } : utils.sh-derivation name { structures-dir = literal structures-dir ; constructor-program = literal constructor-program ; cleaner-program = literal cleaner-program ; salt-program = literal salt-program ; seconds = literal seconds ; destructor-program = literal "${ destructor }/bin/destructor" ; } [ pkgs.coreutils pkgs.utillinux ] ;
@@ -148,7 +148,7 @@ in {
 	        pkgs.keychain
  	        pkgs.signing-party
 	        pkgs.pinentry-curses
-	        ( derivations.shell "standard-shell" ( literal ./public/shells/standard ) )
+	        ( derivations.shell "shell" )
 	        ( derivations.post-commit ( literal "origin" ) )
 	        derivations.rebuild-nixos
 	        ( derivations.foo ( literal "8ee9f204-e76f-4254-92fc-96ea94a0e88f" ) )
@@ -161,7 +161,8 @@ in {
         system-secrets = derivations.pass "system-secrets" ( structure-dir ( structures.dot-gnupg ( literal ./private/gpg-private-keys.asc ) ( literal ./private/gpg-ownertrust.asc ) ( literal ./private/gpg2-private-keys.asc ) ( literal ./private/gpg2-ownertrust.asc ) ) ) ( literal ( derivations.fetchFromGitHub "nextmoose" "secrets" "7c044d920affadca7e66458a7560d8d40f9272ec" "1xnja2sc704v0qz94k9grh06aj296lmbgjl7vmwpvrgzg40bn25l" ) ) { kludge-pinentry = { program = "${ derivations.pass-kludge-pinentry }/bin/pass-kludge-pinentry" ; completion = "${ derivations.pass-kludge-pinentry }/src/completion.sh" ; } ; } ;
     in pkgs.mkShell {
         shellHook = ''
-	    source ${ system-secrets }/completions.sh
+	    source ${ system-secrets }/completions.sh &&
+	        ${ system-secrets }/bin/system-secrets kludge-pinentry uuid
 	'' ;
 	buildInputs = [
 	    system-secrets
