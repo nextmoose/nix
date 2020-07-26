@@ -68,7 +68,7 @@
 		    echo &&
 		    echo &&
 		    echo &&
-		    echo ${ builtins.typeOf configs.format } &&
+		    echo ${ configs.format builtins.typeOf } &&
 		    echo &&
 		    echo &&
 		    echo &&
@@ -184,7 +184,7 @@ in {
         } ;
     } ;
     shell = let
-        dot-ssh = structures.multiple-site-dot-ssh ( structure-file ( literal "config" ) upstream-dot-ssh ) ;
+        dot-ssh = structures.multiple-site-dot-ssh ( structure-dir upstream-dot-ssh ) ;
 	personal-dot-ssh = structures.single-site-dot-ssh ( literal "personal" ) ( literal "github.com" ) ( literal "git" ) ( literal 22 ) ( structure-file "id-rsa" personal-id-rsa ) ( structure-file "secret.asc" user-known-hosts-file ) ;
         personal-id-rsa = structures.ssh-keygen ( structure-dir ( structures.personal-identification-number ( literal 0 ) ( literal "a6104037-4036-4cde-8b10-a8de9f6e3145" ) ) ) ;
 	report-dot-ssh = structures.single-site-dot-ssh ( literal "report" ) ( literal "github.com" ) ( literal "git" ) ( literal 22 ) ( structure-file "id-rsa" report-id-rsa ) ( structure-file "secret.asc" user-known-hosts-file ) ;
