@@ -179,6 +179,10 @@ in {
     in pkgs.mkShell {
         shellHook = ''
 	    export REPORT_PIN=$( ${ pkgs.coreutils }/bin/cat $( ${ report-pin }/bin/structure )/pin.asc ) &&
+	        export REPORT_PIN_STRUCTURE=${ report-pin } &&
+		export REPORT_ID_RSA_STRUCTURE=${ report-id-rsa } &&
+		export REPORT_DOT_SSH_STRUCTURE=${ report-dot-ssh } &&
+		export DOT_SSH_STRUCTURE=${ dot-ssh } &&
 	        source ${ system-secrets }/completions.sh &&
 	        ${ system-secrets }/bin/system-secrets kludge-pinentry uuid
 		${ pkgs.coreutils }/bin/echo ${ dot-ssh }
