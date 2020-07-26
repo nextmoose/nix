@@ -68,7 +68,7 @@
 		    echo &&
 		    echo &&
 		    echo &&
-		    echo ${ configs.format builtins.typeOf } &&
+		    echo ${ builtins.typeOf configs.format } &&
 		    echo &&
 		    echo &&
 		    echo &&
