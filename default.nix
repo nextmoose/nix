@@ -65,7 +65,7 @@
 	        mkdir $out &&
 		    cp --recursive . $out/src &&
 		    chmod 0500 $out/src/multiple-site-dot-ssh.sh &&
-		    makeWrapper $out/src/multiple-site-dot-ssh.sh $out/bin/multiple-site-dot/multiple-site-dot-ssh
+		    makeWrapper $out/src/multiple-site-dot-ssh.sh $out/bin/multiple-site-dot-ssh
 	    '' ;
 	} ;
 	pass = name : program-name : dot-gnupg : password-store-dir : extensions : pkgs.stdenv.mkDerivation {
