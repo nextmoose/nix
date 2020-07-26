@@ -89,13 +89,14 @@ EOF
 	        makeWrapper ${ pkgs.nix }/bin/nix-shell $out/bin/${ attribute-name } --add-flags "./default.nix --attr ${ attribute-name }"
 	    '' ;
 	} ;
-	ssh-keygen = name : uuid : utils.sh-derivation name { uuid = uuid ; } [ pkgs.coreutils pkgs.openssh ] ;
+	ssh-keygen = name : passphrase : utils.sh-derivation name { passphrase = passphrase ; } [ pkgs.coreutils pkgs.openssh ] ;
 	structure = name : constructor-program : destructor : { structures-dir ? "/home/user/.structures" , cleaner-program ? "${ pkgs.coreutils }/bin/true" , salt-program ? "${ pkgs.coreutils }/bin/true" , seconds ? 60 * 60 } : utils.sh-derivation name { structures-dir = literal structures-dir ; constructor-program = literal constructor-program ; cleaner-program = literal cleaner-program ; salt-program = literal salt-program ; seconds = literal seconds ; destructor-program = literal "${ destructor }/bin/destructor" ; } [ pkgs.coreutils pkgs.utillinux ] ;
     } ;
     structures = {
         dot-gnupg = gpg-private-keys : gpg-ownertrust : gpg2-private-keys : gpg2-ownertrust : utils.structure "${ derivations.dot-gnupg gpg-private-keys gpg-ownertrust gpg2-private-keys gpg2-ownertrust }/bin/dot-gnupg" { } ;
         foo = uuid : utils.structure "${ derivations.foo uuid }/bin/foo" { } ;
 	personal-identification-number = digits : uuid : utils.structure "${ derivations.personal-identification-number digits uuid }/bin/personal-identification-number" { } ;
+	ssh-keygen = passphrase : utils.structure "${ derivations.ssh-keygen passphrase }/bin/ssh-keygen" { } ;
     } ;
 in {
     configuration = config : {
@@ -159,14 +160,19 @@ in {
         } ;
     } ;
     shell = let
+        personal-id-rsa = structures.ssh-keygen ( structures.personal-identification-number ( literal 0 ) ( literal "a6104037-4036-4cde-8b10-a8de9f6e3145" ) ) ;
         report-pin = structures.personal-identification-number ( literal 6 ) ( literal "bac2c05d-1668-4dd9-9d6e-8729d7673811" ) ;
+        report-id-rsa = structures.ssh-keygen ( structures.personal-identification-number ( literal 0 ) report-pin ) ;
         system-secrets = derivations.pass "system-secrets" ( structure-dir ( structures.dot-gnupg ( literal ./private/gpg-private-keys.asc ) ( literal ./private/gpg-ownertrust.asc ) ( literal ./private/gpg2-private-keys.asc ) ( literal ./private/gpg2-ownertrust.asc ) ) ) ( literal ( derivations.fetchFromGitHub "nextmoose" "secrets" "7c044d920affadca7e66458a7560d8d40f9272ec" "1xnja2sc704v0qz94k9grh06aj296lmbgjl7vmwpvrgzg40bn25l" ) ) { kludge-pinentry = { program = "${ derivations.pass-kludge-pinentry }/bin/pass-kludge-pinentry" ; completion = "${ derivations.pass-kludge-pinentry }/src/completion.sh" ; } ; } ;
+        upstream-id-rsa = structures.ssh-keygen ( structures.personal-identification-number ( literal 0 ) ( literal "a6104037-4036-4cde-8b10-a8de9f6e3145" ) ) ;
     in pkgs.mkShell {
         shellHook = ''
 	    export REPORT_PIN=$( ${ pkgs.coreutils }/bin/cat $( ${ report-pin }/bin/structure )/pin.asc ) &&
 	        source ${ system-secrets }/completions.sh &&
 	        ${ system-secrets }/bin/system-secrets kludge-pinentry uuid
-		echo ${ report-pin }/bin/structure
+		echo ${ personal-id-rsa }
+		echo ${ upstream-id-rsa }
+		echo ${ report-id-rsa }
 	'' ;
 	buildInputs = [
 	    system-secrets
