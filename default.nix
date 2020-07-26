@@ -24,7 +24,7 @@
 	helloworldsha256 = "a591a6d40bf420404a011733cfb7b190d62c65bf0bcda32b57b277d9ad9f146e" ;
         name-it = named : builtins.listToAttrs ( builtins.map ( name : { name = name ; value = builtins.getAttr name named name ; } ) ( builtins.attrNames named ) ) ;
 	replace-strings = string : builtins.replaceStrings [ "\"" "\$" ] [ "\\\"" "\\\$" ] string ;
-        sh-derivation = name : sets : dependencies : pkgs.stdenv.mkDerivation {
+        sh-derivation = name : sets : args : dependencies : pkgs.stdenv.mkDerivation {
 	    name = name ;
 	    src = ./public/scripts + ("/" + name) ;
 	    buildInputs = [ pkgs.coreutils pkgs.makeWrapper ] ;
@@ -34,7 +34,7 @@
 		    if [ -f $out/src/${ name }.sh ]
 		    then
 		        chmod 0500 $out/src/${ name }.sh &&
-			    makeWrapper $out/src/${ name }.sh $out/bin/${ name } ${ builtins.concatStringsSep " " ( builtins.map ( name : ( builtins.getAttr name sets ).export ( utils.upper-case name ) ) ( builtins.attrNames sets ) ) } --run "export STORE_DIR=$out" --run "export PATH=${ pkgs.lib.makeBinPath dependencies }"
+			    makeWrapper $out/src/${ name }.sh $out/bin/${ name } ${ builtins.concatStringsSep " " ( builtins.map ( name : ( builtins.getAttr name sets ).export ( utils.upper-case name ) ) ( builtins.attrNames sets ) ) } --run "export STORE_DIR=$out" --run "export PATH=${ pkgs.lib.makeBinPath dependencies }" --add-flags "${ builtins.concatStringsSep " " ( builtins.map ( arg : arg.format ( v : v ) ) args ) }"
 		    fi
 	    '' ;
 	} ;
@@ -42,8 +42,8 @@
 	upper-case = string : builtins.replaceStrings [ "-" "a" "b" "c" "d" "e" "f" "g" "h" "i" "j" "k" "l" "m" "n" "o" "p" "q" "r" "s" "t" "u" "v" "w" "x" "y" "z" ] [ "_" "A" "B" "C" "D" "E" "F" "G" "H" "I" "J" "K" "L" "M" "N" "O" "P" "Q" "R" "S" "T" "U" "V" "W" "X" "Y" "Z" ] string ;
     } ;
     derivations = utils.name-it {
-	destructor = name : utils.sh-derivation name { } [ pkgs.coreutils ] ;
-	dot-gnupg = name : gpg-private-keys : gpg-ownertrust : gpg2-private-keys : gpg2-ownertrust : utils.sh-derivation name { gpg-private-keys = gpg-private-keys ; gpg-ownertrust = gpg-ownertrust ; gpg2-private-keys = gpg2-private-keys ; gpg2-ownertrust = gpg2-ownertrust ; } [ pkgs.coreutils pkgs.gnupg ] ;
+	destructor = name : utils.sh-derivation name { } [ ] [ pkgs.coreutils ] ;
+	dot-gnupg = name : gpg-private-keys : gpg-ownertrust : gpg2-private-keys : gpg2-ownertrust : utils.sh-derivation name { gpg-private-keys = gpg-private-keys ; gpg-ownertrust = gpg-ownertrust ; gpg2-private-keys = gpg2-private-keys ; gpg2-ownertrust = gpg2-ownertrust ; } [ ] [ pkgs.coreutils pkgs.gnupg ] ;
 	fetchFromGitHub = name : owner : repo : rev : sha256 : pkgs.stdenv.mkDerivation {
 	    name = name ;
 	    src = pkgs.fetchFromGitHub {
@@ -55,26 +55,9 @@
 	    buildInputs = [ pkgs.coreutils ] ;
 	    installPhase = "cp --recursive . $out" ;
 	} ;
-        foo = name : uuid : utils.sh-derivation name { uuid = uuid ; } [ pkgs.coreutils ] ;
-	foobar = name : literal : dir : file : cat : utils.sh-derivation name { literal = literal ; dir = dir ; file = file ; cat = cat ; } [ pkgs.coreutils ] ;
-	multiple-site-dot-ssh = name : configs : pkgs.stdenv.mkDerivation {
-	    name = name ;
-	    src = ./public/scripts/multiple-site-dot-ssh ;
-	    buildInputs = [ pkgs.coreutils pkgs.makeWrapper ] ;
-	    installPhase = ''
-	        mkdir $out &&
-		    cp --recursive . $out/src &&
-		    chmod 0500 $out/src/multiple-site-dot-ssh.sh &&
-		    echo &&
-		    echo &&
-		    echo &&
-		    echo &&
-		    echo &&
-		    echo &&
-		    echo &&
-		    makeWrapper $out/src/multiple-site-dot-ssh.sh $out/bin/multiple-site-dot-ssh --add-flags "${ configs.format ( file : file ) }"
-	    '' ;
-	} ;
+        foo = name : uuid : utils.sh-derivation name { uuid = uuid ; } [ ] [ pkgs.coreutils ] ;
+	foobar = name : literal : dir : file : cat : utils.sh-derivation name { literal = literal ; dir = dir ; file = file ; cat = cat ; } [ ] [ pkgs.coreutils ] ;
+	multiple-site-dot-ssh = name : configs : utils.sh-derivation name { } [ configs ] [ ] ;
 	pass = name : program-name : dot-gnupg : password-store-dir : extensions : pkgs.stdenv.mkDerivation {
 	    name = name ;
 	    src = ./public/empty ;
@@ -95,11 +78,11 @@ EOF
 		)
 	    '' ;
 	} ;
-	pass-file = name : pass-name : dot-gnupg : password-store-dir : utils.sh-derivation name { pass-name = pass-name ; dot-gnupg = dot-gnupg ; password-store-dir = password-store-dir ; } [ pkgs.coreutils pkgs.pass ] ;
-	pass-kludge-pinentry = name : utils.sh-derivation name { } [ pkgs.coreutils pkgs.gnupg ] ;
-	personal-identification-number = name : digits : uuid : utils.sh-derivation name { digits = digits ; uuid = uuid ; } [ pkgs.coreutils ] ;
-	post-commit = name : remote : utils.sh-derivation name { remote = remote ; } [ pkgs.coreutils pkgs.git ] ;
-	rebuild-nixos = name : utils.sh-derivation name { } [ pkgs.coreutils pkgs.gnugrep pkgs.rsync pkgs.systemd ] ;
+	pass-file = name : pass-name : dot-gnupg : password-store-dir : utils.sh-derivation name { pass-name = pass-name ; dot-gnupg = dot-gnupg ; password-store-dir = password-store-dir ; } [ ] [ pkgs.coreutils pkgs.pass ] ;
+	pass-kludge-pinentry = name : utils.sh-derivation name { } [ ] [ pkgs.coreutils pkgs.gnupg ] ;
+	personal-identification-number = name : digits : uuid : utils.sh-derivation name { digits = digits ; uuid = uuid ; } [ ] [ pkgs.coreutils ] ;
+	post-commit = name : remote : utils.sh-derivation name { remote = remote ; } [ ] [ pkgs.coreutils pkgs.git ] ;
+	rebuild-nixos = name : utils.sh-derivation name { } [ ] [ pkgs.coreutils pkgs.gnugrep pkgs.rsync pkgs.systemd ] ;
 	shell = name : attribute-name : pkgs.stdenv.mkDerivation {
 	    name = name ;
 	    src = ./public/empty ;
@@ -108,9 +91,9 @@ EOF
 	        makeWrapper ${ pkgs.nix }/bin/nix-shell $out/bin/${ attribute-name } --add-flags "./default.nix --attr ${ attribute-name } --show-trace"
 	    '' ;
 	} ;
-	single-site-dot-ssh = name : host : host-name : user : port : identity-file : user-known-hosts-file : utils.sh-derivation name { host = host ; host-name = host-name ; user = user ; port = port ; identity-file = identity-file ; user-known-hosts-file = user-known-hosts-file ; } [ pkgs.coreutils pkgs.gnused ] ;
-	ssh-keygen = name : passphrase : utils.sh-derivation name { passphrase = passphrase ; } [ pkgs.coreutils pkgs.openssh ] ;
-	structure = name : constructor-program : destructor : { structures-dir ? "/home/user/.structures" , cleaner-program ? "${ pkgs.coreutils }/bin/true" , salt-program ? "${ pkgs.coreutils }/bin/true" , seconds ? 60 * 60 } : utils.sh-derivation name { structures-dir = literal structures-dir ; constructor-program = literal constructor-program ; cleaner-program = literal cleaner-program ; salt-program = literal salt-program ; seconds = literal seconds ; destructor-program = literal "${ destructor }/bin/destructor" ; } [ pkgs.coreutils pkgs.utillinux ] ;
+	single-site-dot-ssh = name : host : host-name : user : port : identity-file : user-known-hosts-file : utils.sh-derivation name { host = host ; host-name = host-name ; user = user ; port = port ; identity-file = identity-file ; user-known-hosts-file = user-known-hosts-file ; } [ ] [ pkgs.coreutils pkgs.gnused ] ;
+	ssh-keygen = name : passphrase : utils.sh-derivation name { passphrase = passphrase ; } [ ] [ pkgs.coreutils pkgs.openssh ] ;
+	structure = name : constructor-program : destructor : { structures-dir ? "/home/user/.structures" , cleaner-program ? "${ pkgs.coreutils }/bin/true" , salt-program ? "${ pkgs.coreutils }/bin/true" , seconds ? 60 * 60 } : utils.sh-derivation name { structures-dir = literal structures-dir ; constructor-program = literal constructor-program ; cleaner-program = literal cleaner-program ; salt-program = literal salt-program ; seconds = literal seconds ; destructor-program = literal "${ destructor }/bin/destructor" ; } [ ] [ pkgs.coreutils pkgs.utillinux ] ;
     } ;
     structures = {
         dot-gnupg = gpg-private-keys : gpg-ownertrust : gpg2-private-keys : gpg2-ownertrust : utils.structure "${ derivations.dot-gnupg gpg-private-keys gpg-ownertrust gpg2-private-keys gpg2-ownertrust }/bin/dot-gnupg" { } ;
