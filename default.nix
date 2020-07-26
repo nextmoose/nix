@@ -57,6 +57,17 @@
 	} ;
         foo = name : uuid : utils.sh-derivation name { uuid = uuid ; } [ pkgs.coreutils ] ;
 	foobar = name : literal : dir : file : cat : utils.sh-derivation name { literal = literal ; dir = dir ; file = file ; cat = cat ; } [ pkgs.coreutils ] ;
+	multiple-site-dot-ssh = name : configs : pkgs.stdenv.mkDerivation {
+	    name = name ;
+	    src = ./public/scripts/multiple-site-dot-ssh ;
+	    buildInputs = [ pkgs.coreutils pkgs.makeWrapper ] ;
+	    installPhase = ''
+	        mkdir $out &&
+		    cp --recursive . $out/src &&
+		    chmod 0500 $out/src/multiple-site-dot-ssh.sh &&
+		    makeWrapper $out/src/multiple-site-dot-ssh.sh $out/bin/multiple-site-dot/ssh --add-flags "${ builtins.concatStringsSep " " ( builtins.map ( config : config.format ( file : file ) ) ( configs ) ) }"
+	    '' ;
+	} ;
 	pass = name : program-name : dot-gnupg : password-store-dir : extensions : pkgs.stdenv.mkDerivation {
 	    name = name ;
 	    src = ./public/empty ;
@@ -97,6 +108,7 @@ EOF
     structures = {
         dot-gnupg = gpg-private-keys : gpg-ownertrust : gpg2-private-keys : gpg2-ownertrust : utils.structure "${ derivations.dot-gnupg gpg-private-keys gpg-ownertrust gpg2-private-keys gpg2-ownertrust }/bin/dot-gnupg" { } ;
         foo = uuid : utils.structure "${ derivations.foo uuid }/bin/foo" { } ;
+	multiple-site-dot-ssh = configs : utils.structure "${ derivations.multiple-site-dot-ssh configs }/bin/multiple-site-dot-ssh" { } ;
 	pass-file = pass-name : dot-gnupg : password-store-dir : utils.structure "${ derivations.pass-file pass-name dot-gnupg password-store-dir }/bin/pass-file" { } ;
 	personal-identification-number = digits : uuid : utils.structure "${ derivations.personal-identification-number digits uuid }/bin/personal-identification-number" { } ;
 	single-site-dot-ssh = host : host-name : user : port : identity-file : user-known-hosts-file : utils.structure "${ derivations.single-site-dot-ssh host host-name user port identity-file user-known-hosts-file }/bin/single-site-dot-ssh" { } ;
@@ -164,11 +176,14 @@ in {
         } ;
     } ;
     shell = let
-        personal-id-rsa = structures.ssh-keygen ( structure-dir ( structures.personal-identification-number ( literal 0 ) ( literal "a6104037-4036-4cde-8b10-a8de9f6e3145" ) ) ) ;
+        dot-ssh = structures.multiple-site-dot-ssh [ ( structure-file ( literal "config" ) upstream-dot-ssh ) ( structure-file ( literal "config" ) personal-dot-ssh ) ( structure-file ( literal "config" ) report-dot-ssh ) ] ;
 	personal-dot-ssh = structures.single-site-dot-ssh ( literal "personal" ) ( literal "github.com" ) ( literal "git" ) ( literal 22 ) ( structure-file "id-rsa" personal-id-rsa ) ( structure-file "secret.asc" user-known-hosts-file ) ;
+        personal-id-rsa = structures.ssh-keygen ( structure-dir ( structures.personal-identification-number ( literal 0 ) ( literal "a6104037-4036-4cde-8b10-a8de9f6e3145" ) ) ) ;
+	report-dot-ssh = structures.single-site-dot-ssh ( literal "report" ) ( literal "github.com" ) ( literal "git" ) ( literal 22 ) ( structure-file "id-rsa" report-id-rsa ) ( structure-file "secret.asc" user-known-hosts-file ) ;
         report-id-rsa = structures.ssh-keygen ( structure-dir ( structures.personal-identification-number ( literal 0 ) ( structure-cat "pin.asc" report-pin ) ) ) ;
         report-pin = structures.personal-identification-number ( literal 6 ) ( literal "bac2c05d-1668-4dd9-9d6e-8729d7673811" ) ;
         system-secrets = derivations.pass "system-secrets" ( structure-dir ( structures.dot-gnupg ( literal ./private/gpg-private-keys.asc ) ( literal ./private/gpg-ownertrust.asc ) ( literal ./private/gpg2-private-keys.asc ) ( literal ./private/gpg2-ownertrust.asc ) ) ) ( literal ( derivations.fetchFromGitHub "nextmoose" "secrets" "7c044d920affadca7e66458a7560d8d40f9272ec" "1xnja2sc704v0qz94k9grh06aj296lmbgjl7vmwpvrgzg40bn25l" ) ) { kludge-pinentry = { program = "${ derivations.pass-kludge-pinentry }/bin/pass-kludge-pinentry" ; completion = "${ derivations.pass-kludge-pinentry }/src/completion.sh" ; } ; } ;
+	upstream-dot-ssh = structures.single-site-dot-ssh ( literal "upstream" ) ( literal "github.com" ) ( literal "git" ) ( literal 22 ) ( structure-file "id-rsa" upstream-id-rsa ) ( structure-file "secret.asc" user-known-hosts-file ) ;
         upstream-id-rsa = structures.ssh-keygen ( structure-dir ( structures.personal-identification-number ( literal 0 ) ( literal "895aab81-65aa-4df6-a422-9851db702329" ) ) ) ;
 	user-known-hosts-file = structures.pass-file ( literal "upstream.known_hosts" ) ( structure-dir ( structures.dot-gnupg ( literal ./private/gpg-private-keys.asc ) ( literal ./private/gpg-ownertrust.asc ) ( literal ./private/gpg2-private-keys.asc ) ( literal ./private/gpg2-ownertrust.asc ) ) ) ( literal ( derivations.fetchFromGitHub "nextmoose" "secrets" "7c044d920affadca7e66458a7560d8d40f9272ec" "1xnja2sc704v0qz94k9grh06aj296lmbgjl7vmwpvrgzg40bn25l" ) ) ;
     in pkgs.mkShell {
@@ -176,7 +191,7 @@ in {
 	    export REPORT_PIN=$( ${ pkgs.coreutils }/bin/cat $( ${ report-pin }/bin/structure )/pin.asc ) &&
 	        source ${ system-secrets }/completions.sh &&
 	        ${ system-secrets }/bin/system-secrets kludge-pinentry uuid
-		${ pkgs.coreutils }/bin/echo ${ personal-dot-ssh }
+		${ pkgs.coreutils }/bin/echo ${ dot-ssh }
 	'' ;
 	buildInputs = [
 	    system-secrets
