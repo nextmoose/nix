@@ -57,7 +57,7 @@
 	} ;
         foo = name : uuid : utils.sh-derivation name { uuid = uuid ; } [ ] [ pkgs.coreutils ] ;
 	foobar = name : literal : dir : file : cat : utils.sh-derivation name { literal = literal ; dir = dir ; file = file ; cat = cat ; } [ ] [ pkgs.coreutils ] ;
-	multiple-site-dot-ssh = name : configs : utils.sh-derivation name { } [ configs ] [ pkgs.coreutils ] ;
+	multiple-site-dot-ssh = name : configs : utils.sh-derivation name { } configs [ pkgs.coreutils ] ;
 	pass = name : program-name : dot-gnupg : password-store-dir : extensions : pkgs.stdenv.mkDerivation {
 	    name = name ;
 	    src = ./public/empty ;
@@ -166,7 +166,7 @@ in {
         } ;
     } ;
     shell = let
-        dot-ssh = structures.multiple-site-dot-ssh ( structure-dir upstream-dot-ssh ) ;
+        dot-ssh = structures.multiple-site-dot-ssh [ ( structure-dir upstream-dot-ssh ) ( structure-dir personal-dot-ssh ) ( structure-dir report-dot-ssh ) ] ;
 	personal-dot-ssh = structures.single-site-dot-ssh ( literal "personal" ) ( literal "github.com" ) ( literal "git" ) ( literal 22 ) ( structure-file "id-rsa" personal-id-rsa ) ( structure-file "secret.asc" user-known-hosts-file ) ;
         personal-id-rsa = structures.ssh-keygen ( structure-dir ( structures.personal-identification-number ( literal 0 ) ( literal "a6104037-4036-4cde-8b10-a8de9f6e3145" ) ) ) ;
 	report-dot-ssh = structures.single-site-dot-ssh ( literal "report" ) ( literal "github.com" ) ( literal "git" ) ( literal 22 ) ( structure-file "id-rsa" report-id-rsa ) ( structure-file "secret.asc" user-known-hosts-file ) ;
