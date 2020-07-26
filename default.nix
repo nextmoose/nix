@@ -108,7 +108,7 @@ EOF
 	    src = ./public/empty ;
 	    buildInputs = [ pkgs.makeWrapper ] ;
 	    installPhase = ''
-	        makeWrapper ${ pkgs.nix }/bin/nix-shell $out/bin/${ attribute-name } --add-flags "./default.nix --attr ${ attribute-name }"
+	        makeWrapper ${ pkgs.nix }/bin/nix-shell $out/bin/${ attribute-name } --add-flags "./default.nix --attr ${ attribute-name } --show-trace"
 	    '' ;
 	} ;
 	single-site-dot-ssh = name : host : host-name : user : port : identity-file : user-known-hosts-file : utils.sh-derivation name { host = host ; host-name = host-name ; user = user ; port = port ; identity-file = identity-file ; user-known-hosts-file = user-known-hosts-file ; } [ pkgs.coreutils pkgs.gnused ] ;
