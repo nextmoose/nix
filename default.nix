@@ -57,7 +57,7 @@
 	} ;
         foo = name : uuid : utils.sh-derivation name { uuid = uuid ; } [ ] [ pkgs.coreutils ] ;
 	foobar = name : literal : dir : file : cat : utils.sh-derivation name { literal = literal ; dir = dir ; file = file ; cat = cat ; } [ ] [ pkgs.coreutils ] ;
-	multiple-site-dot-ssh = name : configs : utils.sh-derivation name { } [ configs ] [ ] ;
+	multiple-site-dot-ssh = name : configs : utils.sh-derivation name { } [ configs ] [ pkgs.coreutils ] ;
 	pass = name : program-name : dot-gnupg : password-store-dir : extensions : pkgs.stdenv.mkDerivation {
 	    name = name ;
 	    src = ./public/empty ;
