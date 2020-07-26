@@ -157,4 +157,14 @@ in {
             ] ;
         } ;
     } ;
+    shell = let
+        system-secrets = derivations.pass "system-secrets" ( structure-dir ( structures.dot-gnupg ( literal ./private/gpg-private-keys.asc ) ( literal ./private/gpg-ownertrust.asc ) ( literal ./private/gpg2-private-keys.asc ) ( literal ./private/gpg2-ownertrust.asc ) ) ) ( literal ( derivations.fetchFromGitHub "nextmoose" "secrets" "7c044d920affadca7e66458a7560d8d40f9272ec" "1xnja2sc704v0qz94k9grh06aj296lmbgjl7vmwpvrgzg40bn25l" ) ) { kludge-pinentry = { program = "${ derivations.pass-kludge-pinentry }/bin/pass-kludge-pinentry" ; completion = "${ derivations.pass-kludge-pinentry }/src/completion.sh" ; } ; } ;
+    in pkgs.mkShell {
+        shellHook = ''
+	    source ${ system-secrets }/completions.sh
+	'' ;
+	buildInputs = [
+	    system-secrets
+	] ;
+    } ;
 }
