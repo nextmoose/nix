@@ -72,7 +72,7 @@
 		    echo &&
 		    echo &&
 		    echo &&
-		    makeWrapper $out/src/multiple-site-dot-ssh.sh $out/bin/multiple-site-dot-ssh --add-flag "${ configs.format ( file : file ) }"
+		    makeWrapper $out/src/multiple-site-dot-ssh.sh $out/bin/multiple-site-dot-ssh --add-flags "${ configs.format ( file : file ) }"
 	    '' ;
 	} ;
 	pass = name : program-name : dot-gnupg : password-store-dir : extensions : pkgs.stdenv.mkDerivation {
