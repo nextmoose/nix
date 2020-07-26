@@ -65,16 +65,6 @@
 	        mkdir $out &&
 		    cp --recursive . $out/src &&
 		    chmod 0500 $out/src/multiple-site-dot-ssh.sh &&
-		    echo &&
-		    echo &&
-		    echo &&
-		    echo &&
-		    echo ${ configs.format ( file : builtins.typeOf file ) } &&
-		    echo &&
-		    echo &&
-		    echo &&
-		    echo &&
-		    echo &&
 		    makeWrapper $out/src/multiple-site-dot-ssh.sh $out/bin/multiple-site-dot-ssh
 	    '' ;
 	} ;
