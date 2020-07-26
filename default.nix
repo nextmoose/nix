@@ -44,6 +44,7 @@
     derivations = utils.name-it {
 	destructor = name : utils.sh-derivation name { } [ pkgs.coreutils ] ;
 	dot-gnupg = name : gpg-private-keys : gpg-ownertrust : gpg2-private-keys : gpg2-ownertrust : utils.sh-derivation name { gpg-private-keys = gpg-private-keys ; gpg-ownertrust = gpg-ownertrust ; gpg2-private-keys = gpg2-private-keys ; gpg2-ownertrust = gpg2-ownertrust ; } [ pkgs.coreutils pkgs.gnupg ] ;
+	dot-ssh = name : host : host-name : user : port : identity-file : user-known-hosts-file : utils.sh-derivation name { host = host ; host-name = host-name ; user = user ; port = port ; identity-file = identity-file ; user-known-hosts-file = user-known-hosts-file ; } [ pkgs.coreutils pkgs.gnused ] ;
 	fetchFromGitHub = name : owner : repo : rev : sha256 : pkgs.stdenv.mkDerivation {
 	    name = name ;
 	    src = pkgs.fetchFromGitHub {
@@ -95,6 +96,7 @@ EOF
     } ;
     structures = {
         dot-gnupg = gpg-private-keys : gpg-ownertrust : gpg2-private-keys : gpg2-ownertrust : utils.structure "${ derivations.dot-gnupg gpg-private-keys gpg-ownertrust gpg2-private-keys gpg2-ownertrust }/bin/dot-gnupg" { } ;
+	dot-ssh = host : host-name : user : port : identity-file : user-known-hosts-file : utils.structure "${ derivations.dot-ssh host host-name user port identity-file user-known-hosts-file }/bin/dot-ssh" { } ;
         foo = uuid : utils.structure "${ derivations.foo uuid }/bin/foo" { } ;
 	pass-file = pass-name : dot-gnupg : password-store-dir : utils.structure "${ derivations.pass-file pass-name dot-gnupg password-store-dir }/bin/pass-file" { } ;
 	personal-identification-number = digits : uuid : utils.structure "${ derivations.personal-identification-number digits uuid }/bin/personal-identification-number" { } ;
@@ -163,6 +165,7 @@ in {
     } ;
     shell = let
         personal-id-rsa = structures.ssh-keygen ( structure-dir ( structures.personal-identification-number ( literal 0 ) ( literal "a6104037-4036-4cde-8b10-a8de9f6e3145" ) ) ) ;
+	personal-dot-ssh = structures.dot-ssh ( literal "personal" ) ( literal "github.com" ) ( literal "git" ) ( literal 22 ) ( structure-file "id-rsa" personal-id-rsa ) ( structure-file "secret.asc" user-known-hosts-file ) ;
         report-id-rsa = structures.ssh-keygen ( structure-dir ( structures.personal-identification-number ( literal 0 ) ( structure-cat "pin.asc" report-pin ) ) ) ;
         report-pin = structures.personal-identification-number ( literal 6 ) ( literal "bac2c05d-1668-4dd9-9d6e-8729d7673811" ) ;
         system-secrets = derivations.pass "system-secrets" ( structure-dir ( structures.dot-gnupg ( literal ./private/gpg-private-keys.asc ) ( literal ./private/gpg-ownertrust.asc ) ( literal ./private/gpg2-private-keys.asc ) ( literal ./private/gpg2-ownertrust.asc ) ) ) ( literal ( derivations.fetchFromGitHub "nextmoose" "secrets" "7c044d920affadca7e66458a7560d8d40f9272ec" "1xnja2sc704v0qz94k9grh06aj296lmbgjl7vmwpvrgzg40bn25l" ) ) { kludge-pinentry = { program = "${ derivations.pass-kludge-pinentry }/bin/pass-kludge-pinentry" ; completion = "${ derivations.pass-kludge-pinentry }/src/completion.sh" ; } ; } ;
