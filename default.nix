@@ -1,4 +1,4 @@
-{ pkgs ? import <nixpkgs> { } } : {
+{ pkgs ? import <nixpkgs> { } } : let
     literal = value : {
 	unlock = "${ pkgs.coreutils }/bin/true" ;
 	export = name : utils.export name ( builtins.toString value ) ;
@@ -93,5 +93,68 @@ EOF
     structures = {
         dot-gnupg = gpg-private-keys : gpg-ownertrust : gpg2-private-keys : gpg2-ownertrust : utils.structure "${ derivations.dot-gnupg gpg-private-keys gpg-ownertrust gpg2-private-keys gpg2-ownertrust }/bin/dot-gnupg" { } ;
         foo = uuid : utils.structure "${ derivations.foo uuid }/bin/foo" { } ;
+    } ;
+in {
+    configuration = config : {
+        boot = {
+            kernelPackages = pkgs.linuxPackages_rpi4 ;
+            loader = {
+                grub = {
+                    enable = false ;
+                    version = 2 ;
+                } ;
+                raspberryPi = {
+                    enable = true ;
+                    version = 4 ;
+                } ;
+           } ;
+        } ;
+        imports = [ <nixpkgs/nixos/modules/installer/cd-dvd/sd-image-raspberrypi4.nix> ] ;
+        networking = {
+            interfaces = {
+                eth0.useDHCP = true ;
+                wlan0.useDHCP = true ;
+            } ;
+            useDHCP = false ;
+            wireless = {
+                enable = true ;
+                networks = import ./private/networks.nix ;
+            } ;
+        } ;
+        services = {
+            atd = {
+	        allowEveryone = true ;
+	        enable = true ;
+	    } ;
+	    sshd.enable = true ;
+            xserver = {
+                enable = true ;
+                displayManager.lightdm.enable = true ;
+                desktopManager.lxqt.enable = true ;
+                videoDrivers = [ "fbdev" ] ;
+            } ;
+        } ;
+        system.stateVersion = "20.03" ;
+        users.users.user = {
+            isNormalUser = true ;
+            extraGroups = [ "wheel" "atd" ] ;
+            passwordFile = "/etc/nixos/password.asc" ;
+            packages = [
+	        pkgs.emacs
+	        pkgs.firefox
+	        pkgs.git
+	        pkgs.gnupg
+	        pkgs.gpgme
+	        pkgs.keychain
+ 	        pkgs.signing-party
+	        pkgs.pinentry-curses
+	        ( derivations.shell "standard-shell" ( literal ./public/shells/standard ) )
+	        ( derivations.post-commit ( literal "origin" ) )
+	        derivations.rebuild-nixos
+	        ( derivations.foo ( literal "8ee9f204-e76f-4254-92fc-96ea94a0e88f" ) )
+	        ( derivations.foobar ( literal "6c63a1d6-a6f3-42b0-8b1e-8364e0b0b4bf" ) ( structure-dir ( structures.foo ( literal "1f5df803-dfa8-459a-aabd-916bda0a20c7" ) ) ) ( structure-file "uuid.txt" ( structures.foo ( literal "1f5df803-dfa8-459a-aabd-916bda0a20c7" ) ) ) ( structure-cat "uuid.txt" ( structures.foo ( literal "1f5df803-dfa8-459a-aabd-916bda0a20c7" ) ) ) )
+ 	        ( derivations.pass "system-secrets" ( structure-dir ( structures.dot-gnupg ( literal ./private/gpg-private-keys.asc ) ( literal ./private/gpg-ownertrust.asc ) ( literal ./private/gpg2-private-keys.asc ) ( literal ./private/gpg2-ownertrust.asc ) ) ) ( literal ( derivations.fetchFromGitHub "nextmoose" "secrets" "7c044d920affadca7e66458a7560d8d40f9272ec" "1xnja2sc704v0qz94k9grh06aj296lmbgjl7vmwpvrgzg40bn25l" ) ) { kludge-pinentry = { program = "${ derivations.pass-kludge-pinentry }/bin/pass-kludge-pinentry" ; completion = "${ derivations.pass-kludge-pinentry }/src/completion.sh" ; } ; } )
+            ] ;
+        } ;
     } ;
 }
