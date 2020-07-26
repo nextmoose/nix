@@ -69,7 +69,7 @@
 		    echo &&
 		    echo &&
 		    echo &&
-		    echo ${ builtins.typeOf ( configs.format ) } &&
+		    echo ${ configs.format ( file : builtins.typeOf file ) } &&
 		    echo &&
 		    echo &&
 		    echo &&
