@@ -86,7 +86,7 @@ EOF
 	    src = ./public/empty ;
 	    buildInputs = [ pkgs.makeWrapper ] ;
 	    installPhase = ''
-	        makeWrapper ${ pkgs.nix }/bin/nix-shell $out/bin/${ attribute-name } --add-flags "./default.nix --attr ${ attribute-name }"
+	        makeWrapper ${ pkgs.nix }/bin/nix-shell $out/bin/${ attribute-name } --add-flags "${ ./default.nix } --attr ${ attribute-name }"
 	    '' ;
 	} ;
 	ssh-keygen = name : passphrase : utils.sh-derivation name { passphrase = passphrase ; } [ pkgs.coreutils pkgs.openssh ] ;
