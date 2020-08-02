@@ -29,6 +29,8 @@
 	export = name : utils.export name "$( ${ pkgs.coreutils }/bin/cat \"$( ${ value }/bin/structure )/${ file-name }\" )" ;
 	format = fun : fun "$( ${ pkgs.coreutils }/bin/cat \"$( ${ value }/bin/structure )/${ file-name }\" )" ;
     } ;
+    scripts = {
+    } ;
     utils = {
         export = name : value : "--run \"${ utils.replace-strings "export ${ utils.upper-case name }=\"${ builtins.toString value }\"" }\"" ;
 	helloworldsha256 = "a591a6d40bf420404a011733cfb7b190d62c65bf0bcda32b57b277d9ad9f146e" ;
@@ -103,6 +105,14 @@ EOF
 	    '' ;
 	} ;
 	single-site-dot-ssh = name : host : host-name : user : port : identity-file : user-known-hosts-file : utils.sh-derivation name { host = host ; host-name = host-name ; user = user ; port = port ; identity-file = identity-file ; user-known-hosts-file = user-known-hosts-file ; } [ ] [ pkgs.coreutils pkgs.gnused ] ;
+	ssh = name : configs : pkgs.stdenv.mkDerivation {
+	    name = name ;
+	    src = ./public/empty ;
+	    buildInputs = [ pkgs.makeWrapper ] ;
+	    installPhase = ''
+	        makeWrapper ${ pkgs.openssh }/bin/ssh $out/bin/ssh --add-flags "-F ${ configs.format ( file : file ) }"
+	    '' ;
+	} ;
 	ssh-keygen = name : passphrase : utils.sh-derivation name { passphrase = passphrase ; } [ ] [ pkgs.coreutils pkgs.openssh ] ;
 	structure = name : constructor-program : destructor : { structures-dir ? "/home/user/.structures" , has-scheduled-destruction ? false , cleaner-program ? "${ pkgs.coreutils }/bin/true" , salt-program ? "${ pkgs.coreutils }/bin/true" , seconds ? 60 * 60 } : utils.sh-derivation name { structures-dir = literal structures-dir ; constructor-program = literal constructor-program ; has-scheduled-destruction = literal has-scheduled-destruction ; cleaner-program = literal cleaner-program ; salt-program = literal salt-program ; seconds = literal seconds ; destructor-program = literal "${ destructor }/bin/destructor" ; } [ ] [ pkgs.coreutils pkgs.utillinux ] ;
     } ;
@@ -186,6 +196,7 @@ in {
 	report-dot-ssh = structures.single-site-dot-ssh ( literal "report" ) ( literal "github.com" ) ( literal "git" ) ( literal 22 ) ( structure-file "id-rsa" report-id-rsa ) ( structure-file "secret.asc" user-known-hosts-file ) ;
         report-id-rsa = structures.ssh-keygen ( structure-cat "pin.asc" report-pin ) ;
         report-pin = structures.personal-identification-number ( literal 6 ) ( literal "bac2c05d-1668-4dd9-9d6e-8729d7673811" ) ;
+	ssh = derivations.ssh ( structure-file "config" dot-ssh ) ;
         system-secrets = derivations.pass "system-secrets" ( structure-dir ( structures.dot-gnupg ( literal ./private/gpg-private-keys.asc ) ( literal ./private/gpg-ownertrust.asc ) ( literal ./private/gpg2-private-keys.asc ) ( literal ./private/gpg2-ownertrust.asc ) ) ) ( literal ( derivations.fetchFromGitHub "nextmoose" "secrets" "7c044d920affadca7e66458a7560d8d40f9272ec" "1xnja2sc704v0qz94k9grh06aj296lmbgjl7vmwpvrgzg40bn25l" ) ) { kludge-pinentry = { program = "${ derivations.pass-kludge-pinentry }/bin/pass-kludge-pinentry" ; completion = "${ derivations.pass-kludge-pinentry }/src/completion.sh" ; } ; } ;
 	upstream-dot-ssh = structures.single-site-dot-ssh ( literal "upstream" ) ( literal "github.com" ) ( literal "git" ) ( literal 22 ) ( structure-file "id-rsa" upstream-id-rsa ) ( structure-file "secret.asc" user-known-hosts-file ) ;
         upstream-id-rsa = structures.ssh-keygen ( structure-cat "pin.asc" ( structures.personal-identification-number ( literal 0 ) ( literal "895aab81-65aa-4df6-a422-9851db702329" ) ) ) ;
@@ -210,6 +221,7 @@ in {
 	buildInputs = [
 	    system-secrets
 	    pkgs.firefox
+	    ssh
 	] ;
     } ;
 }
