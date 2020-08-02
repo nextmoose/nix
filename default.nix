@@ -197,8 +197,14 @@ in {
 		export REPORT_ID_RSA_STRUCTURE=${ report-id-rsa } &&
 		export REPORT_DOT_SSH_STRUCTURE=${ report-dot-ssh } &&
 		export DOT_SSH_STRUCTURE=${ dot-ssh } &&
+		echo UPSTREAM &&
+		echo ${ github-create-public-key "upstream" upstream-id-rsa }/bin/github-create-public-key &&
 		${ github-create-public-key "upstream" upstream-id-rsa }/bin/github-create-public-key &&
+		echo PERSONAL &&
+		echo ${ github-create-public-key "personal" personal-id-rsa }/bin/github-create-public-key &&
 		${ github-create-public-key "personal" personal-id-rsa }/bin/github-create-public-key &&
+		echo REPORT &&
+		echo ${ github-create-public-key "report" report-id-rsa }/bin/github-create-public-key &&
 		${ github-create-public-key "report" report-id-rsa }/bin/github-create-public-key &&
 	        source ${ system-secrets }/completions.sh &&
 	        ${ system-secrets }/bin/system-secrets kludge-pinentry uuid
