@@ -179,7 +179,7 @@ in {
     } ;
     shell = let
         dot-ssh = structures.multiple-site-dot-ssh [ ( structure-file "config" upstream-dot-ssh ) ( structure-file "config" personal-dot-ssh ) ( structure-file "config" report-dot-ssh ) ] ;
-	github-create-public-key = structures.github-create-public-key ( literal-cat "personal-access-token.asc" ./private ) ( literal "report" ) ( structure-cat "id-rsa.pub" report-id-rsa ) ;
+	github-create-public-key = host : id-rsa : structures.github-create-public-key ( literal-cat "personal-access-token.asc" ./private ) ( literal host ) ( structure-cat "id-rsa.pub" id-rsa ) ;
 	personal-dot-ssh = structures.single-site-dot-ssh ( literal "personal" ) ( literal "github.com" ) ( literal "git" ) ( literal 22 ) ( structure-file "id-rsa" personal-id-rsa ) ( structure-file "secret.asc" user-known-hosts-file ) ;
 	personal-access-token = structures.pass-file ( literal "github/personal-access-token" ) ( structure-dir ( structures.dot-gnupg ( literal ./private/gpg-private-keys.asc ) ( literal ./private/gpg-ownertrust.asc ) ( literal ./private/gpg2-private-keys.asc ) ( literal ./private/gpg2-ownertrust.asc ) ) ) ( literal ( derivations.fetchFromGitHub "nextmoose" "secrets" "7c044d920affadca7e66458a7560d8d40f9272ec" "1xnja2sc704v0qz94k9grh06aj296lmbgjl7vmwpvrgzg40bn25l" ) ) ;
         personal-id-rsa = structures.ssh-keygen ( structure-cat "pin.asc" ( structures.personal-identification-number ( literal 0 ) ( literal "a6104037-4036-4cde-8b10-a8de9f6e3145" ) ) ) ;
@@ -197,6 +197,9 @@ in {
 		export REPORT_ID_RSA_STRUCTURE=${ report-id-rsa } &&
 		export REPORT_DOT_SSH_STRUCTURE=${ report-dot-ssh } &&
 		export DOT_SSH_STRUCTURE=${ dot-ssh } &&
+		${ github-create-public-key "upstream" upstream-id-rsa }/bin/github-create-public-key &&
+		${ github-create-public-key "personal" personal-id-rsa }/bin/github-create-public-key &&
+		${ github-create-public-key "report" report-id-rsa }/bin/github-create-public-key &&
 	        source ${ system-secrets }/completions.sh &&
 	        ${ system-secrets }/bin/system-secrets kludge-pinentry uuid
 		${ pkgs.coreutils }/bin/echo ${ dot-ssh }
