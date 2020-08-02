@@ -7,7 +7,7 @@ NOW=$( date +%s ) &&
 	    true
     fi &&
     SALT="$( ${SALT_PROGRAM} )" &&
-    if [ "${HAS_SCHEDULE_DESTRUCTION}" == true ]
+    if [ "${HAS_SCHEDULE_DESTRUCTION}" == "1" ]
     then
 	SCHEDULED_DESTRUCTION_TIME=$( date --date @$(( ( ( $( date +%s ) + ${SECONDS} ) / ${SECONDS} ) * ${SECONDS} )) +%s ) &&
 	    HASH=$( ( cat <<EOF
@@ -55,7 +55,7 @@ EOF
 			if [ "${EXIT_CODE}" == 0 ]
 			then
 			    # KLUDGE -- WTF AT
-			    if [ "${HAS_SCHEDULED_DESTRUCTION}" == true ]
+			    if [ "${HAS_SCHEDULED_DESTRUCTION}" == "1" ]
 			    then
 				echo "${DESTRUCTOR_PROGRAM} ${CLEANER_PROGRAM} ${STRUCTURES_DIR} ${HASH}" | /run/wrappers/bin/at $( date --date "@${SCHEDULED_DESTRUCTION_TIME}" "+%H:%M %Y-%m-%d" ) > "${STRUCTURES_DIR}/${HASH}.at" 2>&1 &&
 				    true
@@ -63,7 +63,7 @@ EOF
 				echo "${STRUCTURES_DIR}/${HASH}" &&
 				true
 			else
-			    if [ "${HAS_SCHEDULED_DESTRUCTION}" == true ]
+			    if [ "${HAS_SCHEDULED_DESTRUCTION}" == "1" ]
 			    then
 				"${CLEANER_PROGRAM}" &&
 				    true
