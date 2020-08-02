@@ -70,6 +70,7 @@
         foo = name : uuid : utils.sh-derivation name { uuid = uuid ; } [ ] [ pkgs.coreutils ] ;
 	foobar = name : literal : dir : file : cat : utils.sh-derivation name { literal = literal ; dir = dir ; file = file ; cat = cat ; } [ ] [ pkgs.coreutils ] ;
 	github-create-public-key = name : personal-access-token : title : ssh-public-key : utils.sh-derivation name { personal-access-token = personal-access-token ; title = title ; ssh-public-key = ssh-public-key ; } [ ] [ pkgs.curl ] ;
+	git-project = name : ssh-program : post-commit-program : committer-name : committer-email : upstream-url : personal-url : report-url : personal-branch : utils.sh-derivation { ssh-program = ssh-program ; post-commit-program = post-commit-program ; committer-name = committer-name ; committer-email = committer-email ; upstream-url = upstream-url ; personal-url = personal-url ; report-url = report-url ; personal-branch = personal-branch ; } [ ] [ pkgs.coreutils pkgs.git ] ;
 	multiple-site-dot-ssh = name : configs : utils.sh-derivation name { } configs [ pkgs.coreutils ] ;
 	pass = name : program-name : dot-gnupg : password-store-dir : extensions : pkgs.stdenv.mkDerivation {
 	    name = name ;
@@ -120,6 +121,7 @@ EOF
         dot-gnupg = gpg-private-keys : gpg-ownertrust : gpg2-private-keys : gpg2-ownertrust : utils.structure "${ derivations.dot-gnupg gpg-private-keys gpg-ownertrust gpg2-private-keys gpg2-ownertrust }/bin/dot-gnupg" { } ;
         foo = uuid : utils.structure "${ derivations.foo uuid }/bin/foo" { } ;
 	github-create-public-key = personal-access-token : title : ssh-public-key : utils.structure "${ derivations.github-create-public-key personal-access-token title ssh-public-key }/bin/github-create-public-key" { } ;
+	git-project = ssh-program : post-commit-program : committer-name : committer-email : upstream-url : personal-url : remote-url : personal-branch : utils.structure "${ derivations.git-project ssh-program post-commit-program committer-name committer-email upstream-url personal-url remote-url personal-branch }/bin/git-project" { } ;
 	multiple-site-dot-ssh = configs : utils.structure "${ derivations.multiple-site-dot-ssh configs }/bin/multiple-site-dot-ssh" { } ;
 	pass-file = pass-name : dot-gnupg : password-store-dir : utils.structure "${ derivations.pass-file pass-name dot-gnupg password-store-dir }/bin/pass-file" { } ;
 	personal-identification-number = digits : uuid : utils.structure "${ derivations.personal-identification-number digits uuid }/bin/personal-identification-number" { } ;
@@ -204,24 +206,14 @@ in {
         report-id-rsa = structures.ssh-keygen ( structure-cat "pin.asc" report-pin ) ;
         report-pin = structures.personal-identification-number ( literal 6 ) ( literal "bac2c05d-1668-4dd9-9d6e-8729d7673811" ) ;
 	ssh = derivations.ssh ( structure-file "config" dot-ssh ) ;
-        system-secrets = derivations.pass "system-secrets" ( structure-dir ( structures.dot-gnupg ( structure-file "secret.asc" boot.gpg-private-keys ) ( structure-file "secret.asc" boot.gpg-ownertrust ) ( structure-file "secret.asc" boot.gpg2-private-keys ) ( structure-file "secret.asc" boot.gpg2-ownertrust ) ) ) ( literal ( derivations.fetchFromGitHub "nextmoose" "secrets" "7c044d920affadca7e66458a7560d8d40f9272ec" "1xnja2sc704v0qz94k9grh06aj296lmbgjl7vmwpvrgzg40bn25l" ) ) { kludge-pinentry = { program = "${ derivations.pass-kludge-pinentry }/bin/pass-kludge-pinentry" ; completion = "${ derivations.pass-kludge-pinentry }/src/completion.sh" ; } ; } ;
+        system-secrets = derivations.pass "system-secrets" ( structure-dir ( structures.dot-gnupg ( structure-file "secret.asc" boot.gpg-private-keys ) ( structure-file "secret.asc" boot.gpg-ownertrust ) ( structure-file "secret.asc" boot.gpg2-private-keys ) ( structure-file "secret.asc" boot.gpg2-ownertrust ) ) ) ( structure-dir ( structures.git-project ( literal "${ ssh }/bin/ssh" ) ( literal "${ derivations.post-commit ( literal "personal" ) }/bin/post-commit" ) ( literal "Emory Merryman" ) ( literal "emory.merryman@gmail.com" ) ( literal "upstream:nextmoose/secrets.git" ) ( literal "personal:nextmoose/secrets.git" ) ( literal "report:nextmoose/secrets.git" ) ( literal "8e81930b-25e9-4efd-be0f-da8fa180b206" ) ) ) { kludge-pinentry = { program = "${ derivations.pass-kludge-pinentry }/bin/pass-kludge-pinentry" ; completion = "${ derivations.pass-kludge-pinentry }/src/completion.sh" ; } ; } ;
 	upstream-dot-ssh = structures.single-site-dot-ssh ( literal "upstream" ) ( literal "github.com" ) ( literal "git" ) ( literal 22 ) ( structure-file "id-rsa" upstream-id-rsa ) ( structure-file "secret.asc" user-known-hosts-file ) ;
         upstream-id-rsa = structures.ssh-keygen ( structure-cat "pin.asc" ( structures.personal-identification-number ( literal 0 ) ( literal "895aab81-65aa-4df6-a422-9851db702329" ) ) ) ;
 	user-known-hosts-file = structures.pass-file ( literal "upstream.known_hosts" ) ( structure-dir ( structures.dot-gnupg ( literal ./private/gpg-private-keys.asc ) ( literal ./private/gpg-ownertrust.asc ) ( literal ./private/gpg2-private-keys.asc ) ( literal ./private/gpg2-ownertrust.asc ) ) ) ( literal ( derivations.fetchFromGitHub "nextmoose" "secrets" "7c044d920affadca7e66458a7560d8d40f9272ec" "1xnja2sc704v0qz94k9grh06aj296lmbgjl7vmwpvrgzg40bn25l" ) ) ;
     in pkgs.mkShell {
         shellHook = ''
 	    export REPORT_PIN=$( ${ pkgs.coreutils }/bin/cat $( ${ report-pin }/bin/structure )/pin.asc ) &&
-	        export REPORT_PIN_STRUCTURE=${ report-pin } &&
-		export REPORT_ID_RSA_STRUCTURE=${ report-id-rsa } &&
-		export REPORT_DOT_SSH_STRUCTURE=${ report-dot-ssh } &&
-		export DOT_SSH_STRUCTURE=${ dot-ssh } &&
-		echo UPSTREAM &&
-		${ github-create-public-key "upstream" upstream-id-rsa }/bin/structure &&
-		echo PERSONAL &&
-		${ github-create-public-key "personal" personal-id-rsa }/bin/structure &&
-		echo REPORT &&
-		${ github-create-public-key "report" report-id-rsa }/bin/structure &&
-	        source ${ system-secrets }/completions.sh &&
+	        ${ boot-secrets }/bin/boot-secrets kludge-pinentry uuid
 	        ${ system-secrets }/bin/system-secrets kludge-pinentry uuid
 		${ pkgs.coreutils }/bin/echo ${ dot-ssh }
 	'' ;

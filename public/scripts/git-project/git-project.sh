@@ -1,6 +1,7 @@
 #!/bin/sh
 
 git init &&
+    ln --symbolic "${POST_COMMIT_PROGRAM}" .git/hooks/post-commit &&
     git config core.sshCommand "${SSH_PROGRAM}" &&
     git config user.name "${COMMITTER_NAME}" &&
     git config user.email "${COMMITTER_EMAIL}" &&
