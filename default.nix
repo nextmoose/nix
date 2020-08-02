@@ -193,6 +193,7 @@ in {
 	buildInputs = [
 	    system-secrets
 	    pkgs.firefox
+	    personal-access-token
 	] ;
     } ;
 }
