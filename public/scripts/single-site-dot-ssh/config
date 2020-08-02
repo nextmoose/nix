@@ -5,4 +5,4 @@ Port ${PORT}
 IdentityFile ${IDENTITY_FILE}
 UserKnownHostsFile ${USER_KNOWN_HOSTS_FILE}
 ControlMaster auto
-ControlPath ${DOT_SSH}/_%C
+ControlPath ${DOT_SSH}/_%h%p%r
