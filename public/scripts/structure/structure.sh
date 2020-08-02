@@ -7,14 +7,25 @@ NOW=$( date +%s ) &&
 	    true
     fi &&
     SALT="$( ${SALT_PROGRAM} )" &&
-    SCHEDULED_DESTRUCTION_TIME=$( date --date @$(( ( ( $( date +%s ) + ${SECONDS} ) / ${SECONDS} ) * ${SECONDS} )) +%s ) &&
-    HASH=$( ( cat <<EOF
+    if [ "${HAS_SCHEDULE_DESTRUCTION}" == true ]
+    then
+	SCHEDULED_DESTRUCTION_TIME=$( date --date @$(( ( ( $( date +%s ) + ${SECONDS} ) / ${SECONDS} ) * ${SECONDS} )) +%s ) &&
+	    HASH=$( ( cat <<EOF
 ${CONSTRUCTOR_PROGRAM}
 ${CLEANER_PROGRAM}
 ${SALT}
 ${SCHEDULED_DESTRUCTION_TIME}
 EOF
-	   ) | md5sum | cut --bytes 1-32 ) &&
+		    ) | md5sum | cut --bytes 1-32 ) &&
+	    true
+    else
+	    HASH=$( ( cat <<EOF
+${CONSTRUCTOR_PROGRAM}
+${SALT}
+EOF
+		    ) | md5sum | cut --bytes 1-32 ) &&
+		true
+    fi &&
     (
 	( flock --shared 201 || exit 1 ) &&
 	    if [ -d "${STRUCTURES_DIR}/${HASH}" ]
@@ -33,6 +44,7 @@ EOF
 			AFTER=$( date +%s ) &&
 			( cat > "${STRUCTURES_DIR}/${HASH}.log" <<EOF
 CONSTRUCTOR_PROGRAM=${CONSTRUCTOR_PROGRAM}
+HAS_SCHEDULE_DESTRUCTION=${HAS_SCHEDULED_DESTRUCTION}
 CLEANER_PROGRAM=${CLEANER_PROGRAM}
 SALT=${SALT}
 SCHEDULE_DESTRUCTION_TIME=${SCHEDULED_DESTRUCTION_TIME}
@@ -43,11 +55,19 @@ EOF
 			if [ "${EXIT_CODE}" == 0 ]
 			then
 			    # KLUDGE -- WTF AT
-			    echo "${DESTRUCTOR_PROGRAM} ${CLEANER_PROGRAM} ${STRUCTURES_DIR} ${HASH}" | /run/wrappers/bin/at $( date --date "@${SCHEDULED_DESTRUCTION_TIME}" "+%H:%M %Y-%m-%d" ) > "${STRUCTURES_DIR}/${HASH}.at" 2>&1 &&
+			    if [ "${HAS_SCHEDULED_DESTRUCTION}" == true ]
+			    then
+				echo "${DESTRUCTOR_PROGRAM} ${CLEANER_PROGRAM} ${STRUCTURES_DIR} ${HASH}" | /run/wrappers/bin/at $( date --date "@${SCHEDULED_DESTRUCTION_TIME}" "+%H:%M %Y-%m-%d" ) > "${STRUCTURES_DIR}/${HASH}.at" 2>&1 &&
+				    true
+			    fi &&
 				echo "${STRUCTURES_DIR}/${HASH}" &&
 				true
 			else
-			    "${CLEANER_PROGRAM}" &&
+			    if [ "${HAS_SCHEDULED_DESTRUCTION}" == true ]
+			    then
+				"${CLEANER_PROGRAM}" &&
+				    true
+			    fi &&
 				if [ ! -d "${STRUCTURES_DIR}/${HASH}.debug" ]
 				then
 				    mkdir "${STRUCTURES_DIR}/${HASH}.debug" &&

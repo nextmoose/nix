@@ -57,6 +57,7 @@
 	} ;
         foo = name : uuid : utils.sh-derivation name { uuid = uuid ; } [ ] [ pkgs.coreutils ] ;
 	foobar = name : literal : dir : file : cat : utils.sh-derivation name { literal = literal ; dir = dir ; file = file ; cat = cat ; } [ ] [ pkgs.coreutils ] ;
+	github-create-public-key = name : personal-access-token : title : ssh-public-key : utils.sh-derivation name { personal-access-token = personal-access-token ; title = title ; ssh-public-key = ssh-public-key ; } [ ] [ pkgs.curl ] ;
 	multiple-site-dot-ssh = name : configs : utils.sh-derivation name { } configs [ pkgs.coreutils ] ;
 	pass = name : program-name : dot-gnupg : password-store-dir : extensions : pkgs.stdenv.mkDerivation {
 	    name = name ;
@@ -93,11 +94,12 @@ EOF
 	} ;
 	single-site-dot-ssh = name : host : host-name : user : port : identity-file : user-known-hosts-file : utils.sh-derivation name { host = host ; host-name = host-name ; user = user ; port = port ; identity-file = identity-file ; user-known-hosts-file = user-known-hosts-file ; } [ ] [ pkgs.coreutils pkgs.gnused ] ;
 	ssh-keygen = name : passphrase : utils.sh-derivation name { passphrase = passphrase ; } [ ] [ pkgs.coreutils pkgs.openssh ] ;
-	structure = name : constructor-program : destructor : { structures-dir ? "/home/user/.structures" , cleaner-program ? "${ pkgs.coreutils }/bin/true" , salt-program ? "${ pkgs.coreutils }/bin/true" , seconds ? 60 * 60 } : utils.sh-derivation name { structures-dir = literal structures-dir ; constructor-program = literal constructor-program ; cleaner-program = literal cleaner-program ; salt-program = literal salt-program ; seconds = literal seconds ; destructor-program = literal "${ destructor }/bin/destructor" ; } [ ] [ pkgs.coreutils pkgs.utillinux ] ;
+	structure = name : constructor-program : destructor : { structures-dir ? "/home/user/.structures" , has-scheduled-destruction ? false , cleaner-program ? "${ pkgs.coreutils }/bin/true" , salt-program ? "${ pkgs.coreutils }/bin/true" , seconds ? 60 * 60 } : utils.sh-derivation name { structures-dir = literal structures-dir ; constructor-program = literal constructor-program ; has-scheduled-destruction = has-scheduled-destruction ; cleaner-program = literal cleaner-program ; salt-program = literal salt-program ; seconds = literal seconds ; destructor-program = literal "${ destructor }/bin/destructor" ; } [ ] [ pkgs.coreutils pkgs.utillinux ] ;
     } ;
     structures = {
         dot-gnupg = gpg-private-keys : gpg-ownertrust : gpg2-private-keys : gpg2-ownertrust : utils.structure "${ derivations.dot-gnupg gpg-private-keys gpg-ownertrust gpg2-private-keys gpg2-ownertrust }/bin/dot-gnupg" { } ;
         foo = uuid : utils.structure "${ derivations.foo uuid }/bin/foo" { } ;
+	github-create-public-key = personal-access-token : title : ssh-public-key : utils.structure "${ derivations.github-create-public-key personal-access-token title ssh-public-key }/bin/github-create-public-key" { } ;
 	multiple-site-dot-ssh = configs : utils.structure "${ derivations.multiple-site-dot-ssh configs }/bin/multiple-site-dot-ssh" { } ;
 	pass-file = pass-name : dot-gnupg : password-store-dir : utils.structure "${ derivations.pass-file pass-name dot-gnupg password-store-dir }/bin/pass-file" { } ;
 	personal-identification-number = digits : uuid : utils.structure "${ derivations.personal-identification-number digits uuid }/bin/personal-identification-number" { } ;
