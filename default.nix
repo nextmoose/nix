@@ -207,7 +207,6 @@ in {
 	buildInputs = [
 	    system-secrets
 	    pkgs.firefox
-	    github-create-public-key
 	] ;
     } ;
 }
