@@ -70,7 +70,7 @@
         foo = name : uuid : utils.sh-derivation name { uuid = uuid ; } [ ] [ pkgs.coreutils ] ;
 	foobar = name : literal : dir : file : cat : utils.sh-derivation name { literal = literal ; dir = dir ; file = file ; cat = cat ; } [ ] [ pkgs.coreutils ] ;
 	github-create-public-key = name : personal-access-token : title : ssh-public-key : utils.sh-derivation name { personal-access-token = personal-access-token ; title = title ; ssh-public-key = ssh-public-key ; } [ ] [ pkgs.curl ] ;
-	git-project = name : ssh-program : post-commit-program : committer-name : committer-email : upstream-url : personal-url : report-url : personal-branch : utils.sh-derivation { ssh-program = ssh-program ; post-commit-program = post-commit-program ; committer-name = committer-name ; committer-email = committer-email ; upstream-url = upstream-url ; personal-url = personal-url ; report-url = report-url ; personal-branch = personal-branch ; } [ ] [ pkgs.coreutils pkgs.git ] ;
+	git-project = name : ssh-program : post-commit-program : committer-name : committer-email : upstream-url : personal-url : report-url : personal-branch : utils.sh-derivation name { ssh-program = ssh-program ; post-commit-program = post-commit-program ; committer-name = committer-name ; committer-email = committer-email ; upstream-url = upstream-url ; personal-url = personal-url ; report-url = report-url ; personal-branch = personal-branch ; } [ ] [ pkgs.coreutils pkgs.git ] ;
 	multiple-site-dot-ssh = name : configs : utils.sh-derivation name { } configs [ pkgs.coreutils ] ;
 	pass = name : program-name : dot-gnupg : password-store-dir : extensions : pkgs.stdenv.mkDerivation {
 	    name = name ;
