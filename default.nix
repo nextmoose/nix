@@ -221,6 +221,7 @@ in {
 		${ github-create-public-key "report" report-dot-ssh }/bin/github-create-public-key &&
 	        source ${ system-secrets }/completions.sh &&
 	        ${ system-secrets }/bin/system-secrets kludge-pinentry user-known-hosts &&
+		true
 	'' ;
 	buildInputs = [
 	    boot-secrets
