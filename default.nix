@@ -200,7 +200,6 @@ in {
 	    gpg2-ownertrust = structures.pass-file ( literal "gpg2-ownertrust" ) ( structure-dir ( structures.dot-gnupg ( literal ./private/gpg-private-keys.asc ) ( literal ./private/gpg-ownertrust.asc ) ( literal ./private/gpg2-private-keys.asc ) ( literal ./private/gpg2-ownertrust.asc ) ) ) ( literal ( derivations.fetchFromGitHub "nextmoose" "secrets" boot-commit boot-sha256 ) ) ;
 	    gpg2-private-keys = structures.pass-file ( literal "gpg2-private-keys" ) ( structure-dir ( structures.dot-gnupg ( literal ./private/gpg-private-keys.asc ) ( literal ./private/gpg-ownertrust.asc ) ( literal ./private/gpg2-private-keys.asc ) ( literal ./private/gpg2-ownertrust.asc ) ) ) ( literal ( derivations.fetchFromGitHub "nextmoose" "secrets" boot-commit boot-sha256 ) ) ;
 	    personal-access-token = structures.pass-file ( literal "personal-access-token" ) ( structure-dir ( structures.dot-gnupg ( literal ./private/gpg-private-keys.asc ) ( literal ./private/gpg-ownertrust.asc ) ( literal ./private/gpg2-private-keys.asc ) ( literal ./private/gpg2-ownertrust.asc ) ) ) ( literal ( derivations.fetchFromGitHub "nextmoose" "secrets" boot-commit boot-sha256 ) ) ;
- 	    ssh = derivations.ssh ( structure-file "config" dot-ssh ) ;
 	    user-known-hosts-file = structures.pass-file ( literal "user-known-hosts-file" ) ( structure-dir ( structures.dot-gnupg ( literal ./private/gpg-private-keys.asc ) ( literal ./private/gpg-ownertrust.asc ) ( literal ./private/gpg2-private-keys.asc ) ( literal ./private/gpg2-ownertrust.asc ) ) ) ( literal ( derivations.fetchFromGitHub "nextmoose" "secrets" boot-commit boot-sha256 ) ) ;
 	} ;
         boot-secrets = derivations.pass "boot-secrets" ( structure-dir ( structures.dot-gnupg ( literal ./private/gpg-private-keys.asc ) ( literal ./private/gpg-ownertrust.asc ) ( literal ./private/gpg2-private-keys.asc ) ( literal ./private/gpg2-ownertrust.asc ) ) ) ( literal ( derivations.fetchFromGitHub "nextmoose" "secrets" boot-commit boot-sha256 ) ) { kludge-pinentry = { program = "${ derivations.pass-kludge-pinentry }/bin/pass-kludge-pinentry" ; completion = "${ derivations.pass-kludge-pinentry }/src/completion.sh" ; } ; } ;
@@ -231,6 +230,8 @@ in {
 		${ github-create-public-key "upstream" upstream-id-rsa }/bin/structure &&
 		${ github-create-public-key "personal" personal-id-rsa }/bin/structure &&
 		${ github-create-public-key "report" report-id-rsa }/bin/structure &&
+		export SYSTEM_SECRETS=${ system-secrets }/bin/system-secrets &&
+		${ pkgs.bash }/bin/bash &&
 	        ${ system-secrets }/bin/system-secrets kludge-pinentry user-known-hosts &&
 	        ${ builtins.concatStringsSep "&& \n" ( builtins.map ( secret : "source ${ secret }/completions.sh" ) secrets ) }
 	        ${ builtins.concatStringsSep "&& \n" ( builtins.map ( secret : "echo source ${ secret }/completions.sh" ) secrets ) }
