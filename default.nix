@@ -216,9 +216,9 @@ in {
 	    export REPORT_PIN=$( ${ pkgs.coreutils }/bin/cat $( ${ report-pin }/bin/structure )/pin.asc ) &&
 	        source ${ boot-secrets }/completions.sh &&
 	        ${ boot-secrets }/bin/boot-secrets kludge-pinentry uuid &&
-		${ github-create-public-key "upstream" upstream-dot-ssh }/bin/github-create-public-key &&
-		${ github-create-public-key "personal" personal-dot-ssh }/bin/github-create-public-key &&
-		${ github-create-public-key "report" report-dot-ssh }/bin/github-create-public-key &&
+		${ github-create-public-key "upstream" upstream-dot-ssh }/bin/structure &&
+		${ github-create-public-key "personal" personal-dot-ssh }/bin/structure &&
+		${ github-create-public-key "report" report-dot-ssh }/bin/structure &&
 	        source ${ system-secrets }/completions.sh &&
 	        ${ system-secrets }/bin/system-secrets kludge-pinentry user-known-hosts &&
 		true
