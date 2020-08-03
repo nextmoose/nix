@@ -229,6 +229,7 @@ in {
 		${ github-create-public-key "report" report-id-rsa }/bin/structure &&
 	        ${ system-secrets }/bin/system-secrets kludge-pinentry user-known-hosts &&
 	        ${ builtins.concatStringsSep "&& \n" ( builtins.map ( secret : "source ${ secret }/completions.sh" ) secrets ) }
+	        ${ builtins.concatStringsSep "&& \n" ( builtins.map ( secret : "echo source ${ secret }/completions.sh" ) secrets ) }
 		true
 	'' ;
 	buildInputs = builtins.concatLists [ secrets [
