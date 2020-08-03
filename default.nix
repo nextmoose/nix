@@ -217,6 +217,7 @@ in {
 	        ${ system-secrets }/bin/system-secrets kludge-pinentry uuid
 	'' ;
 	buildInputs = [
+	    boot-secrets
 	    system-secrets
 	    pkgs.firefox
 	] ;
