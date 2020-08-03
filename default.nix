@@ -215,7 +215,7 @@ in {
         shellHook = ''
 	    export REPORT_PIN=$( ${ pkgs.coreutils }/bin/cat $( ${ report-pin }/bin/structure )/pin.asc ) &&
 	        source ${ boot-secrets }/completions.sh &&
-	        ${ boot-secrets }/bin/boot-secrets kludge-pinentry uuid &&
+	        ${ boot-secrets }/bin/boot-secrets kludge-pinentry user-known-hosts &&
 		${ github-create-public-key "upstream" upstream-id-rsa }/bin/structure &&
 		${ github-create-public-key "personal" personal-id-rsa }/bin/structure &&
 		${ github-create-public-key "report" report-id-rsa }/bin/structure &&
