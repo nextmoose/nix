@@ -79,14 +79,14 @@
 	    installPhase = ''
 	        makeWrapper ${ pkgs.pass }/bin/pass $out/bin/${ program-name } ${ dot-gnupg.format ( dir : "--run \"export PASSWORD_STORE_GPG_OPTS=\\\"--homedir ${ dir }\\\"\"" ) } ${ password-store-dir.export "PASSWORD_STORE_DIR" } --run "export PASSWORD_STORE_ENABLE_EXTENSIONS=\"true\"" --run "export PASSWORD_STORE_EXTENSIONS_DIR=\"$out/extensions\""
 		${ builtins.concatStringsSep "\n" ( builtins.map ( name : "makeWrapper ${ ( builtins.getAttr name extensions ).program } $out/extensions/${ name }.bash" ) ( builtins.attrNames extensions ) ) }
-		sed -e "s#_pass#_pass_$( basename $out )#g" -e "s# pass# ${ program-name }#g" -e "s#.{PASSWORD_STORE_DIR:-\$HOME/[.]password-store/}#${ password-store-dir.format ( dir : dir ) }#" -e "w$out/pass-completions.sh" ${ pkgs.pass }/share/bash-completion/completions/pass
+		sed -e "s#PASSWORD_STORE_EXTENSION_COMMANDS#PASSWORD_STORE_EXTENSION_COMMANDS_$( basename $out )#" -e "s#_pass#_pass_$( basename $out )#g" -e "s# pass# ${ program-name }#g" -e "s#.{PASSWORD_STORE_DIR:-\$HOME/[.]password-store/}#${ password-store-dir.format ( dir : dir ) }#" -e "w$out/pass-completions.sh" ${ pkgs.pass }/share/bash-completion/completions/pass
 		mkdir $out/completions
 		${ builtins.concatStringsSep "\n" ( builtins.map ( name : "sed -e \"s#_pass#_pass_$( basename $out )#g\" -e \"s#COMMAND#${ name }#g\" -e \"w$out/completions/${ name }.sh\" ${ ( builtins.getAttr name extensions ).completion }" ) ( builtins.filter ( name : builtins.hasAttr "completion" ( builtins.getAttr name extensions ) ) ( builtins.attrNames extensions ) ) ) }
 		( cat > $out/completions.sh <<EOF
 #!/bin/sh
 
 source $out/pass-completions.sh
-PASSWORD_STORE_EXTENSION_COMMANDS=( ${ builtins.concatStringsSep " " ( builtins.attrNames extensions ) } )
+PASSWORD_STORE_EXTENSION_COMMANDS_$( basename $out )=( ${ builtins.concatStringsSep " " ( builtins.attrNames extensions ) } )
 ${ builtins.concatStringsSep "\n" ( builtins.map ( name : "source $out/completions/${ name }.sh" ) ( builtins.filter ( name : builtins.hasAttr "completion" ( builtins.getAttr name extensions ) ) ( builtins.attrNames extensions ) ) ) }
 EOF
 		)
