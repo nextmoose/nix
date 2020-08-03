@@ -191,8 +191,8 @@ in {
         } ;
     } ;
     shell = let
-        boot-commit = "9f7b2aaca78aa06888f948b4354e1938381ae2d9" ;
-	boot-sha256 = "1y88hci0ssaam6f2fvfic7yi3i9fbp09s6gglaz3dwnxvnqbi0kw" ;
+        boot-commit = "da590c0eefeb80b4691b99854df13a5e037a50db" ;
+	boot-sha256 = utils.helloworldsha256 ;
         boot = {
 	    gpg-ownertrust = structures.pass-file ( literal "gpg-ownertrust" ) ( structure-dir ( structures.dot-gnupg ( literal ./private/gpg-private-keys.asc ) ( literal ./private/gpg-ownertrust.asc ) ( literal ./private/gpg2-private-keys.asc ) ( literal ./private/gpg2-ownertrust.asc ) ) ) ( literal ( derivations.fetchFromGitHub "nextmoose" "secrets" boot-commit boot-sha256 ) ) ;
 	    gpg-private-keys = structures.pass-file ( literal "gpg-private-keys" ) ( structure-dir ( structures.dot-gnupg ( literal ./private/gpg-private-keys.asc ) ( literal ./private/gpg-ownertrust.asc ) ( literal ./private/gpg2-private-keys.asc ) ( literal ./private/gpg2-ownertrust.asc ) ) ) ( literal ( derivations.fetchFromGitHub "nextmoose" "secrets" boot-commit boot-sha256 ) ) ;
