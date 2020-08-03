@@ -6,6 +6,7 @@ then
 	pass git checkout "personal/${STARTER_BRANCH}" .gitattributes &&
 	pass git checkout "personal/${STARTER_BRANCH}" .gpg-id &&
 	pass git checkout -b "${NEW_BRANCH}" &&
+	pass git commit -am "STARTING" &&
 	pass git push personal HEAD &&
 	true
 fi &&
