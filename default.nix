@@ -94,7 +94,7 @@ EOF
 	} ;
 	pass-file = name : pass-name : dot-gnupg : password-store-dir : utils.sh-derivation name { pass-name = pass-name ; dot-gnupg = dot-gnupg ; password-store-dir = password-store-dir ; } [ ] [ pkgs.coreutils pkgs.pass ] ;
 	pass-kludge-pinentry = name : utils.sh-derivation name { } [ ] [ pkgs.coreutils pkgs.gnupg ] ;
-	pass-kludge-start = name : starter-branch : new-branch : utils.sh-derivation { starter-branch = starter-branch ; new-branch = new-branch ; } [ ] [ pkgs.pass ] ;
+	pass-kludge-start = name : starter-branch : new-branch : utils.sh-derivation name { starter-branch = starter-branch ; new-branch = new-branch ; } [ ] [ pkgs.pass ] ;
 	personal-identification-number = name : digits : uuid : utils.sh-derivation name { digits = digits ; uuid = uuid ; } [ ] [ pkgs.coreutils ] ;
 	post-commit = name : remote : utils.sh-derivation name { remote = remote ; } [ ] [ pkgs.coreutils pkgs.git ] ;
 	rebuild-nixos = name : utils.sh-derivation name { } [ ] [ pkgs.coreutils pkgs.gnugrep pkgs.rsync pkgs.systemd ] ;
