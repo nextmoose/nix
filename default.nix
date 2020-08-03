@@ -209,6 +209,11 @@ in {
 	report-dot-ssh = structures.single-site-dot-ssh ( literal "report" ) ( literal "github.com" ) ( literal "git" ) ( literal 22 ) ( structure-file "id-rsa" report-id-rsa ) ( structure-file "secret.asc" boot.user-known-hosts-file ) ;
         report-id-rsa = structures.ssh-keygen ( structure-cat "pin.asc" report-pin ) ;
         report-pin = structures.personal-identification-number ( literal 6 ) ( literal "bac2c05d-1668-4dd9-9d6e-8729d7673811" ) ;
+	secrets = [
+	    boot-secrets
+	    system-secrets
+	    ( derivations.pass "start-secrets" ( structure-dir ( structures.dot-gnupg ( structure-file "secret.asc" boot.gpg-private-keys ) ( structure-file "secret.asc" boot.gpg-ownertrust ) ( structure-file "secret.asc" boot.gpg2-private-keys ) ( structure-file "secret.asc" boot.gpg2-ownertrust ) ) ) ( structure-dir ( structures.git-project ( literal "${ ssh }/bin/ssh" ) ( literal "${ derivations.post-commit ( literal "personal" ) }/bin/post-commit" ) ( literal "Emory Merryman" ) ( literal "emory.merryman@gmail.com" ) ( literal "upstream:nextmoose/secrets.git" ) ( literal "personal:nextmoose/secrets.git" ) ( literal "report:nextmoose/secrets.git" ) ( literal "ece43b24-7eb0-4a8e-a892-5a368489c7f0" ) ) ) { kludge-pinentry = { program = "${ derivations.pass-kludge-pinentry }/bin/pass-kludge-pinentry" ; completion = "${ derivations.pass-kludge-pinentry }/src/completion.sh" ; } ; } )
+	] ;
 	ssh = derivations.ssh ( structure-file "config" dot-ssh ) ;
         system-secrets = derivations.pass "system-secrets" ( structure-dir ( structures.dot-gnupg ( structure-file "secret.asc" boot.gpg-private-keys ) ( structure-file "secret.asc" boot.gpg-ownertrust ) ( structure-file "secret.asc" boot.gpg2-private-keys ) ( structure-file "secret.asc" boot.gpg2-ownertrust ) ) ) ( structure-dir ( structures.git-project ( literal "${ ssh }/bin/ssh" ) ( literal "${ derivations.post-commit ( literal "personal" ) }/bin/post-commit" ) ( literal "Emory Merryman" ) ( literal "emory.merryman@gmail.com" ) ( literal "upstream:nextmoose/secrets.git" ) ( literal "personal:nextmoose/secrets.git" ) ( literal "report:nextmoose/secrets.git" ) ( literal "8e81930b-25e9-4efd-be0f-da8fa180b206" ) ) ) { kludge-pinentry = { program = "${ derivations.pass-kludge-pinentry }/bin/pass-kludge-pinentry" ; completion = "${ derivations.pass-kludge-pinentry }/src/completion.sh" ; } ; } ;
 	upstream-dot-ssh = structures.single-site-dot-ssh ( literal "upstream" ) ( literal "github.com" ) ( literal "git" ) ( literal 22 ) ( structure-file "id-rsa" upstream-id-rsa ) ( structure-file "secret.asc" boot.user-known-hosts-file ) ;
@@ -216,19 +221,16 @@ in {
     in pkgs.mkShell {
         shellHook = ''
 	    export REPORT_PIN=$( ${ pkgs.coreutils }/bin/cat $( ${ report-pin }/bin/structure )/pin.asc ) &&
-	        source ${ boot-secrets }/completions.sh &&
 	        ${ boot-secrets }/bin/boot-secrets kludge-pinentry user-known-hosts &&
 		${ github-create-public-key "upstream" upstream-id-rsa }/bin/structure &&
 		${ github-create-public-key "personal" personal-id-rsa }/bin/structure &&
 		${ github-create-public-key "report" report-id-rsa }/bin/structure &&
-	        source ${ system-secrets }/completions.sh &&
 	        ${ system-secrets }/bin/system-secrets kludge-pinentry user-known-hosts &&
+	        ${ builtins.concatStringsSep "&& \n" ( builtins.map ( secret : "source ${ secret }/completions.sh" ) secrets ) }
 		true
 	'' ;
-	buildInputs = [
-	    boot-secrets
-	    system-secrets
+	buildInputs = builtins.concatLists [ secrets [
 	    pkgs.firefox
-	] ;
+	] ] ;
     } ;
 }
