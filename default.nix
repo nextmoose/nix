@@ -70,6 +70,7 @@
         foo = name : uuid : utils.sh-derivation name { uuid = uuid ; } [ ] [ pkgs.coreutils ] ;
 	foobar = name : literal : dir : file : cat : utils.sh-derivation name { literal = literal ; dir = dir ; file = file ; cat = cat ; } [ ] [ pkgs.coreutils ] ;
 	github-create-public-key = name : personal-access-token : title : ssh-public-key : utils.sh-derivation name { personal-access-token = personal-access-token ; title = title ; ssh-public-key = ssh-public-key ; } [ ] [ pkgs.curl ] ;
+	github-delete-public-key = name : personal-access-token : create-dir : utils.sh-derivation name { personal-access-token = personal-access-token ; create-dir = create-dir ; } [ ] [ pkgs.coreutils pkgs.curl pkgs.jq ] ;
 	git-project = name : ssh-program : post-commit-program : committer-name : committer-email : upstream-url : personal-url : report-url : personal-branch : utils.sh-derivation name { ssh-program = ssh-program ; post-commit-program = post-commit-program ; committer-name = committer-name ; committer-email = committer-email ; upstream-url = upstream-url ; personal-url = personal-url ; report-url = report-url ; personal-branch = personal-branch ; } [ ] [ pkgs.coreutils pkgs.git ] ;
 	multiple-site-dot-ssh = name : configs : utils.sh-derivation name { } configs [ pkgs.coreutils ] ;
 	pass = name : program-name : dot-gnupg : password-store-dir : extensions : pkgs.stdenv.mkDerivation {
@@ -123,6 +124,7 @@ EOF
         dot-gnupg = gpg-private-keys : gpg-ownertrust : gpg2-private-keys : gpg2-ownertrust : utils.structure "${ derivations.dot-gnupg gpg-private-keys gpg-ownertrust gpg2-private-keys gpg2-ownertrust }/bin/dot-gnupg" { } ;
         foo = uuid : utils.structure "${ derivations.foo uuid }/bin/foo" { } ;
 	github-create-public-key = personal-access-token : title : ssh-public-key : utils.structure "${ derivations.github-create-public-key personal-access-token title ssh-public-key }/bin/github-create-public-key" { } ;
+	github-delete-public-key = personal-access-token : create-dir : utils.structure "${ derivations.github-delete-public-key personal-access-token create-dir }/github-delete-public-key" { } ;
 	git-project = ssh-program : post-commit-program : committer-name : committer-email : upstream-url : personal-url : remote-url : personal-branch : utils.structure "${ derivations.git-project ssh-program post-commit-program committer-name committer-email upstream-url personal-url remote-url personal-branch }/bin/git-project" { } ;
 	multiple-site-dot-ssh = configs : utils.structure "${ derivations.multiple-site-dot-ssh configs }/bin/multiple-site-dot-ssh" { } ;
 	pass-file = pass-name : dot-gnupg : password-store-dir : utils.structure "${ derivations.pass-file pass-name dot-gnupg password-store-dir }/bin/pass-file" { } ;
@@ -206,6 +208,7 @@ in {
         boot-secrets = derivations.pass "boot-secrets" ( structure-dir ( structures.dot-gnupg ( literal ./private/gpg-private-keys.asc ) ( literal ./private/gpg-ownertrust.asc ) ( literal ./private/gpg2-private-keys.asc ) ( literal ./private/gpg2-ownertrust.asc ) ) ) ( literal ( derivations.fetchFromGitHub "nextmoose" "secrets" boot-commit boot-sha256 ) ) { kludge-pinentry = { program = "${ derivations.pass-kludge-pinentry }/bin/pass-kludge-pinentry" ; completion = "${ derivations.pass-kludge-pinentry }/src/completion.sh" ; } ; } ;
         dot-ssh = structures.multiple-site-dot-ssh [ ( structure-file "config" upstream-dot-ssh ) ( structure-file "config" personal-dot-ssh ) ( structure-file "config" report-dot-ssh ) ] ;
 	github-create-public-key = host : id-rsa : structures.github-create-public-key ( structure-cat "secret.asc" boot.personal-access-token ) ( literal host ) ( structure-cat "id-rsa.pub" id-rsa ) ;
+	github-delete-public-key = create-dir : structures.github-delete-public-key ( structure-cat "secret.asc" boot.personal-access-token ) ( structure-dir create-dir ) ;
 	personal-dot-ssh = structures.single-site-dot-ssh ( literal "personal" ) ( literal "github.com" ) ( literal "git" ) ( literal 22 ) ( structure-file "id-rsa" personal-id-rsa ) ( structure-file "secret.asc" boot.user-known-hosts-file ) ;
         personal-id-rsa = structures.ssh-keygen ( structure-cat "pin.asc" ( structures.personal-identification-number ( literal 0 ) ( literal "a6104037-4036-4cde-8b10-a8de9f6e3145" ) ) ) ;
 	report-dot-ssh = structures.single-site-dot-ssh ( literal "report" ) ( literal "github.com" ) ( literal "git" ) ( literal 22 ) ( structure-file "id-rsa" report-id-rsa ) ( structure-file "secret.asc" boot.user-known-hosts-file ) ;
@@ -225,13 +228,24 @@ in {
         system-secrets = derivations.pass "system-secrets" ( structure-dir ( structures.dot-gnupg ( structure-file "secret.asc" boot.gpg-private-keys ) ( structure-file "secret.asc" boot.gpg-ownertrust ) ( structure-file "secret.asc" boot.gpg2-private-keys ) ( structure-file "secret.asc" boot.gpg2-ownertrust ) ) ) ( structure-dir ( structures.git-project ( literal "${ ssh }/bin/ssh" ) ( literal "${ derivations.post-commit ( literal "personal" ) }/bin/post-commit" ) ( literal "Emory Merryman" ) ( literal "emory.merryman@gmail.com" ) ( literal "upstream:nextmoose/secrets.git" ) ( literal "personal:nextmoose/secrets.git" ) ( literal "report:nextmoose/secrets.git" ) ( literal "8e81930b-25e9-4efd-be0f-da8fa180b206" ) ) ) { kludge-pinentry = { program = "${ derivations.pass-kludge-pinentry }/bin/pass-kludge-pinentry" ; completion = "${ derivations.pass-kludge-pinentry }/src/completion.sh" ; } ; } ;
 	upstream-dot-ssh = structures.single-site-dot-ssh ( literal "upstream" ) ( literal "github.com" ) ( literal "git" ) ( literal 22 ) ( structure-file "id-rsa" upstream-id-rsa ) ( structure-file "secret.asc" boot.user-known-hosts-file ) ;
         upstream-id-rsa = structures.ssh-keygen ( structure-cat "pin.asc" ( structures.personal-identification-number ( literal 0 ) ( literal "895aab81-65aa-4df6-a422-9851db702329" ) ) ) ;
+	create-public-key = {
+	    upstream = github-create-public-key "upstream" upstream-id-rsa ;
+	    personal = github-create-public-key "personal" personal-id-rsa ;
+	    report = github-create-public-key "report" report-id-rsa ;
+	} ;
     in pkgs.mkShell {
         shellHook = ''
-	    export REPORT_PIN=$( ${ pkgs.coreutils }/bin/cat $( ${ report-pin }/bin/structure )/pin.asc ) &&
+	    cleanup() {
+	        ${ github-delete-public-key create-public-key.upstream }/bin/github-delete-public-key &&
+	            ${ github-delete-public-key create-public-key.personal }/bin/github-delete-public-key &&
+	            ${ github-delete-public-key create-public-key.report }/bin/github-delete-public-key &&
+		    true
+	    } &&
+	        export REPORT_PIN=$( ${ pkgs.coreutils }/bin/cat $( ${ report-pin }/bin/structure )/pin.asc ) &&
 	        ${ boot-secrets }/bin/boot-secrets kludge-pinentry user-known-hosts &&
-		${ github-create-public-key "upstream" upstream-id-rsa }/bin/structure &&
-		${ github-create-public-key "personal" personal-id-rsa }/bin/structure &&
-		${ github-create-public-key "report" report-id-rsa }/bin/structure &&
+		${ create-public-key.upstream }/bin/structure &&
+		${ create-public-key.personal }/bin/structure &&
+		${ create-public-key.report }/bin/structure &&
 	        ${ system-secrets }/bin/system-secrets kludge-pinentry user-known-hosts &&
 	        ${ builtins.concatStringsSep "&& \n" ( builtins.map ( secret : "source ${ secret }/completions.sh" ) secrets ) }
 	        ${ builtins.concatStringsSep "&& \n" ( builtins.map ( secret : "echo source ${ secret }/completions.sh" ) secrets ) }
