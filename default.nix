@@ -241,6 +241,7 @@ in {
 	            ${ github-delete-public-key create-public-key.report }/bin/github-delete-public-key &&
 		    true
 	    } &&
+	        trap cleanup EXIT &&
 	        export REPORT_PIN=$( ${ pkgs.coreutils }/bin/cat $( ${ report-pin }/bin/structure )/pin.asc ) &&
 	        ${ boot-secrets }/bin/boot-secrets kludge-pinentry user-known-hosts &&
 		${ create-public-key.upstream }/bin/structure &&
