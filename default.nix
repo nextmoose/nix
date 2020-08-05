@@ -75,6 +75,14 @@
 	        makeWrapper ${ pkgs.firefox }/bin/firefox $out/bin/firefox ${ home.export "home" }
 	    '' ;
 	} ;
+	gnucash = name : home : pkgs.stdenv.mkDerivation {
+	    name = name ;
+	    src = public/empty ;
+	    buildInputs = [ pkgs.makeWrapper ] ;
+	    installPhase = ''
+	        makeWrapper ${ pkgs.gnucash }/bin/gnucash $out/bin/gnucash ${ home.export "home" }
+	    '' ;
+	} ;
         foo = name : uuid : utils.sh-derivation name { uuid = uuid ; } [ ] [ pkgs.coreutils ] ;
 	foobar = name : literal : dir : file : cat : utils.sh-derivation name { literal = literal ; dir = dir ; file = file ; cat = cat ; } [ ] [ pkgs.coreutils ] ;
 	github-create-public-key = name : personal-access-token : title : ssh-public-key : utils.sh-derivation name { personal-access-token = personal-access-token ; title = title ; ssh-public-key = ssh-public-key ; } [ ] [ pkgs.curl ] ;
@@ -263,6 +271,7 @@ in {
 	'' ;
 	buildInputs = builtins.concatLists [ secrets [
 	    ( derivations.firefox ( structure-dir structures.temporary ) )
+	    ( derivations.gnucash ( structure-dir structures.temporary ) )
 	] ] ;
     } ;
 }
