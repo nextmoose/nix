@@ -139,7 +139,7 @@ EOF
 	personal-identification-number = digits : uuid : utils.structure "${ derivations.personal-identification-number digits uuid }/bin/personal-identification-number" { } ;
 	single-site-dot-ssh = host : host-name : user : port : identity-file : user-known-hosts-file : utils.structure "${ derivations.single-site-dot-ssh host host-name user port identity-file user-known-hosts-file }/bin/single-site-dot-ssh" { } ;
 	ssh-keygen = passphrase : utils.structure "${ derivations.ssh-keygen passphrase }/bin/ssh-keygen" { } ;
-	temporary = utils.structure "${ pkgs.coreutils }/bin/true" { seed = "${ pkgs.coreutils }/bin/uuidgen" ; } ;
+	temporary = utils.structure "${ pkgs.coreutils }/bin/true" { salt = "${ pkgs.coreutils }/bin/uuidgen" ; } ;
     } ;
 in {
     configuration = config : {
