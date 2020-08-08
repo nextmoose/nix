@@ -272,7 +272,7 @@ in {
 	'' ;
 	buildInputs = builtins.concatLists [ secrets [
 	    ( derivations.firefox ( structure-dir structures.temporary ) )
-	    ( derivations.gnucash ( structure-dir structures.temporary ) )
+#	    ( derivations.gnucash ( structure-dir structures.temporary ) )
 	] ] ;
     } ;
 }
