@@ -6,7 +6,7 @@ NOW=$( date +%s ) &&
     do
 	FILE_NAME="${PASS_NAME}.gpg" &&
 	    PASS_LENGTH="$( pass show "${PASS_NAME}" | tr -d "\n" | wc --bytes )" &&
-	    COMMIT_TIME=$( pass git --format=%ct -- "${FILE_NAME}" ) &&
+	    COMMIT_TIME=$( pass git log --max-count 1 --format=%ct -- "${FILE_NAME}" ) &&
 	    AGE=$(( ${NOW} - ${COMMIT_TIME} )) &&
 	    if [ "${AGE}" -gt $(( 60 * 60 * 24 * 7 * 4 * 3 )) ]
 	    then
