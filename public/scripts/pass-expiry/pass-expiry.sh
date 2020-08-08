@@ -1,7 +1,7 @@
 #!/bin/sh
 
 NOW=$( date +%s ) &&
-    YEAR=$( date --date @${NOW} +%Y ) &&
+    YEAR=$( date --date @${NOW} +%y ) &&
     pass git ls-tree --name-only --full-tree HEAD | grep "[.]gpg\$" | sed -e "s#[.]gpg\$##" | while read PASS_NAME
     do
 	FILE_NAME="${PASS_NAME}.gpg" &&
