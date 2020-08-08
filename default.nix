@@ -271,6 +271,7 @@ in {
 		true
 	'' ;
 	buildInputs = builtins.concatLists [ secrets [
+	    pkgs.awscli
 	    ( derivations.firefox ( structure-dir structures.temporary ) )
 #	    ( derivations.gnucash ( structure-dir structures.temporary ) )
 	] ] ;
