@@ -264,7 +264,7 @@ in {
 	'' ;
 	buildInputs = builtins.concatLists [ secrets [
 	    pkgs.awscli
-	    ( derivations.firefox ( structure-dir structures.temporary ( literal "b1f835d0-95cd-4201-b9b8-84693f9a049e" ) ) )
+	    ( derivations.firefox ( structure-dir ( structures.temporary "b1f835d0-95cd-4201-b9b8-84693f9a049e" ) ) )
 	] ] ;
     } ;
 }
