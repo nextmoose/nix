@@ -6,7 +6,11 @@ NOW=$( date +%s ) &&
 	mkdir "${STRUCTURES_DIR}" &&
 	    true
     fi &&
-    SALT="$( ${SALT_PROGRAM} )" &&
+    if [ -z "${SALT}" ]
+    then
+	SALT="$( ${SALT_PROGRAM} )" &&
+	    true
+    fi &&
     if [ "${HAS_SCHEDULE_DESTRUCTION}" == "1" ]
     then
 	SCHEDULED_DESTRUCTION_TIME=$( date --date @$(( ( ( $( date +%s ) + ${SECONDS} ) / ${SECONDS} ) * ${SECONDS} )) +%s ) &&
