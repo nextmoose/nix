@@ -3,6 +3,7 @@
 /run/wrappers/bin/sudo systemctl restart nix-daemon.service &&
 /run/wrappers/bin/sudo rsync --archive --delete --progress configuration.nix /etc/nixos/configuration.nix &&
 /run/wrappers/bin/sudo rsync --archive --delete --progress default.nix /etc/nixos/default.nix &&
+/run/wrappers/bin/sudo rsync --archive --delete --progress default.nix /etc/nixos/default.nix &&
 /run/wrappers/bin/sudo rsync --archive --delete --progress private /etc/nixos/ &&
 /run/wrappers/bin/sudo rsync --archive --delete --progress public /etc/nixos/ &&
 /run/current-system/sw/bin/nixos-rebuild build --show-trace &&
