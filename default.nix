@@ -261,8 +261,8 @@ in {
 		${ create-public-key.report }/bin/structure &&
 	        ${ system-secrets }/bin/system-secrets kludge-pinentry user-known-hosts &&
 	        ${ builtins.concatStringsSep "&& \n" ( builtins.map ( secret : "source ${ secret }/completions.sh" ) secrets ) }
-		export NIX_IDE=$( structure-dir ( nix-ide ) ) &&
-		export HOME=$( structure-dir ( structures.temporary "8d5c342f-8d6e-479f-a2cf-590016c2b61e" ) ) &&
+		export NIX_IDE=$( ${ nix-ide }/bin/structure ) &&
+		export HOME=$( ${ structures.temporary "8d5c342f-8d6e-479f-a2cf-590016c2b61e" }/bin/structure ) &&
 		cd $HOME &&
 		true
 	'' ;
