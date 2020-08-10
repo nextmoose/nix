@@ -217,6 +217,7 @@ in {
         dot-ssh = structures.multiple-site-dot-ssh [ ( structure-file "config" upstream-dot-ssh ) ( structure-file "config" personal-dot-ssh ) ( structure-file "config" report-dot-ssh ) ] ;
 	github-create-public-key = host : id-rsa : structures.github-create-public-key ( structure-cat "secret.asc" boot.personal-access-token ) ( literal host ) ( structure-cat "id-rsa.pub" id-rsa ) ;
 	github-delete-public-key = create-dir : structures.github-delete-public-key ( structure-cat "secret.asc" boot.personal-access-token ) ( structure-dir create-dir ) ;
+	nix-ide = ( structures.git-project ( literal "${ ssh }/bin/ssh" ) ( literal "${ derivations.post-commit ( literal "personal" ) }/bin/post-commit" ) ( literal "Emory Merryman" ) ( literal "emory.merryman@gmail.com" ) ( literal "upstream:nextmoose/nix.git" ) ( literal "personal:nextmoose/nix.git" ) ( literal "report:nextmoose/nix.git" ) ( literal "scratch/34bdfa2d-908c-4824-bfa4-54f6c4d25f83" ) ) ;
 	personal-dot-ssh = structures.single-site-dot-ssh ( literal "personal" ) ( literal "github.com" ) ( literal "git" ) ( literal 22 ) ( structure-file "id-rsa" personal-id-rsa ) ( structure-file "secret.asc" boot.user-known-hosts-file ) ;
         personal-id-rsa = structures.ssh-keygen ( structure-cat "pin.asc" ( structures.personal-identification-number ( literal 0 ) ( literal "a6104037-4036-4cde-8b10-a8de9f6e3145" ) ) ) ;
 	report-dot-ssh = structures.single-site-dot-ssh ( literal "report" ) ( literal "github.com" ) ( literal "git" ) ( literal 22 ) ( structure-file "id-rsa" report-id-rsa ) ( structure-file "secret.asc" boot.user-known-hosts-file ) ;
@@ -260,6 +261,7 @@ in {
 		${ create-public-key.report }/bin/structure &&
 	        ${ system-secrets }/bin/system-secrets kludge-pinentry user-known-hosts &&
 	        ${ builtins.concatStringsSep "&& \n" ( builtins.map ( secret : "source ${ secret }/completions.sh" ) secrets ) }
+		export NIX_IDE=$( structure-dir ( nix-ide ) ) &&
 		export HOME=$( structure-dir ( structures.temporary "8d5c342f-8d6e-479f-a2cf-590016c2b61e" ) ) &&
 		cd $HOME &&
 		true
