@@ -206,7 +206,7 @@ in {
         } ;
     } ;
     shell = let
-        aws-s3-dir = aws-s3-dir ( literal "bffbdc36-383c-4b4e-b041-a420f3bf146c" ) ;
+        aws-s3-dir = structures.aws-s3-dir ( literal "bffbdc36-383c-4b4e-b041-a420f3bf146c" ) ;
         boot-commit = "da590c0eefeb80b4691b99854df13a5e037a50db" ;
 	boot-sha256 = "1ssm4bmmds58y8rim8w1x77cgn81lsdr7sfrhz8wr1c5rjjjc2xi" ;
         boot = {
