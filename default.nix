@@ -55,7 +55,7 @@
     } ;
     derivations = utils.name-it {
         aws-s3-dir = name : bucket : utils.sh-derivation name { bucket = bucket ; } [ ] [ pkgs.awscli ] ;
-	aws-s3-dir-retire = name : structure-dir : bucket : utils.sh-derivation { structure-dir = structure-dir ; bucket = bucket ; } [ ] [ pkgs.awscli pkgs.coreutils ] ;
+	aws-s3-dir-retire = name : structure-dir : bucket : utils.sh-derivation name { structure-dir = structure-dir ; bucket = bucket ; } [ ] [ pkgs.awscli pkgs.coreutils ] ;
 	destructor = name : utils.sh-derivation name { } [ ] [ pkgs.coreutils ] ;
 	dot-gnupg = name : gpg-private-keys : gpg-ownertrust : gpg2-private-keys : gpg2-ownertrust : utils.sh-derivation name { gpg-private-keys = gpg-private-keys ; gpg-ownertrust = gpg-ownertrust ; gpg2-private-keys = gpg2-private-keys ; gpg2-ownertrust = gpg2-ownertrust ; } [ ] [ pkgs.coreutils pkgs.gnupg ] ;
 	fetchFromGitHub = name : owner : repo : rev : sha256 : pkgs.stdenv.mkDerivation {
