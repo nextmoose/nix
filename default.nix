@@ -208,7 +208,7 @@ in {
     shell = let
         aws = {
 	    aws-access-key-id = literal "AKIAYZXVAKILLINJD77P" ;
-	    aws-secret-access-key = structure-cat "secret.asc" ( structures.pass-file ( literal "iam/AKIAYZXVAKILLINJD77P" ) ( structure-dir ( structures.dot-gnupg ( literal ./private/gpg-private-keys.asc ) ( literal ./private/gpg-ownertrust.asc ) ( literal ./private/gpg2-private-keys.asc ) ( literal ./private/gpg2-ownertrust.asc ) ) ) ( literal ( derivations.fetchFromGitHub "nextmoose" "secrets" boot-commit boot-sha256 ) ) ) ;
+	    aws-secret-access-key = structure-cat "secret.asc" ( structures.pass-file ( literal "iam/AKIAYZXVAKILLINJD77P" ) ( structure-dir ( structures.dot-gnupg ( literal ./private/gpg-private-keys.asc ) ( literal ./private/gpg-ownertrust.asc ) ( literal ./private/gpg2-private-keys.asc ) ( literal ./private/gpg2-ownertrust.asc ) ) ) ( structure-dir ( structures.git-project ( literal "${ ssh }/bin/ssh" ) ( literal "${ derivations.post-commit ( literal "personal" ) }/bin/post-commit" ) ( literal "Emory Merryman" ) ( literal "emory.merryman@gmail.com" ) ( literal "upstream:nextmoose/secrets.git" ) ( literal "personal:nextmoose/secrets.git" ) ( literal "report:nextmoose/secrets.git" ) ( literal "4bac4dda-1908-4b1b-a8ee-93756613485b" ) ) ) ) ;
 	    aws-default-region = literal "us-east-1" ;
         } ;
         aws-s3-dir = structures.aws-s3-dir aws.aws-access-key-id aws.aws-secret-access-key aws.aws-default-region ( literal "bffbdc36-383c-4b4e-b041-a420f3bf146c" ) ;
