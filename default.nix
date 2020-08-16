@@ -261,7 +261,7 @@ in {
 	        ${ github-delete-public-key create-public-key.upstream }/bin/structure &&
 	            ${ github-delete-public-key create-public-key.personal }/bin/structure &&
 	            ${ github-delete-public-key create-public-key.report }/bin/structure &&
-		    ${ derivations.aws-s3-dir-retire aws.aws-access-key-id aws.aws-secret-access-key aws.aws-default-region ( structure-dir aws-s3-dir ) ( literal "bffbdc36-383c-4b4e-b041-a420f3bf146c" ) }/bin/aws-s3-dir-retire &&
+#		    ${ derivations.aws-s3-dir-retire aws.aws-access-key-id aws.aws-secret-access-key aws.aws-default-region ( structure-dir aws-s3-dir ) ( literal "bffbdc36-383c-4b4e-b041-a420f3bf146c" ) }/bin/aws-s3-dir-retire &&
 		    true
 	    } &&
 	        trap cleanup EXIT &&
@@ -275,6 +275,7 @@ in {
 		export NIX_IDE=$( ${ nix-ide }/bin/structure ) &&
 		export HOME=$( ${ aws-s3-dir }/bin/structure ) &&
 		cd $HOME &&
+		echo RETIRE ... ${ derivations.aws-s3-dir-retire aws.aws-access-key-id aws.aws-secret-access-key aws.aws-default-region ( structure-dir aws-s3-dir ) ( literal "bffbdc36-383c-4b4e-b041-a420f3bf146c" ) }/bin/aws-s3-dir-retire &&
 		true
 	'' ;
 	buildInputs = builtins.concatLists [ secrets [
