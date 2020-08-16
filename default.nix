@@ -54,8 +54,8 @@
 	upper-case = string : builtins.replaceStrings [ "-" "a" "b" "c" "d" "e" "f" "g" "h" "i" "j" "k" "l" "m" "n" "o" "p" "q" "r" "s" "t" "u" "v" "w" "x" "y" "z" ] [ "_" "A" "B" "C" "D" "E" "F" "G" "H" "I" "J" "K" "L" "M" "N" "O" "P" "Q" "R" "S" "T" "U" "V" "W" "X" "Y" "Z" ] string ;
     } ;
     derivations = utils.name-it {
-        aws-s3-dir = name : aws-access-key-id : aws-secret-access-key : aws-default-region : bucket : utils.sh-derivation name { bucket = bucket ; } [ ] [ pkgs.awscli ] ;
-	aws-s3-dir-retire = name : structure-dir : aws-access-key-id : aws-secret-access-key : aws-default-region : bucket : utils.sh-derivation name { structure-dir = structure-dir ; bucket = bucket ; } [ ] [ pkgs.awscli pkgs.coreutils ] ;
+        aws-s3-dir = name : aws-access-key-id : aws-secret-access-key : aws-default-region : bucket : utils.sh-derivation name { aws-access-key-id = aws-access-key-id ; aws-secret-access-key = aws-secret-access-key ; aws-default-region = aws-default-region ; bucket = bucket ; } [ ] [ pkgs.awscli ] ;
+	aws-s3-dir-retire = name : structure-dir : aws-access-key-id : aws-secret-access-key : aws-default-region : bucket : utils.sh-derivation name { structure-dir = structure-dir ; aws-access-key-id = aws-access-key-id ; aws-secret-access-key = aws-secret-access-key ; aws-default-region = aws-default-region ; bucket = bucket ; } [ ] [ pkgs.awscli pkgs.coreutils ] ;
 	destructor = name : utils.sh-derivation name { } [ ] [ pkgs.coreutils ] ;
 	dot-gnupg = name : gpg-private-keys : gpg-ownertrust : gpg2-private-keys : gpg2-ownertrust : utils.sh-derivation name { gpg-private-keys = gpg-private-keys ; gpg-ownertrust = gpg-ownertrust ; gpg2-private-keys = gpg2-private-keys ; gpg2-ownertrust = gpg2-ownertrust ; } [ ] [ pkgs.coreutils pkgs.gnupg ] ;
 	fetchFromGitHub = name : owner : repo : rev : sha256 : pkgs.stdenv.mkDerivation {
