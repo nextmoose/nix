@@ -54,8 +54,8 @@
 	upper-case = string : builtins.replaceStrings [ "-" "a" "b" "c" "d" "e" "f" "g" "h" "i" "j" "k" "l" "m" "n" "o" "p" "q" "r" "s" "t" "u" "v" "w" "x" "y" "z" ] [ "_" "A" "B" "C" "D" "E" "F" "G" "H" "I" "J" "K" "L" "M" "N" "O" "P" "Q" "R" "S" "T" "U" "V" "W" "X" "Y" "Z" ] string ;
     } ;
     derivations = utils.name-it {
-        aws-s3-dir = name : bucket : utils.sh-derivation name { bucket = bucket ; } [ ] [ pkgs.awscli ] ;
-	aws-s3-dir-retire = name : structure-dir : bucket : utils.sh-derivation name { structure-dir = structure-dir ; bucket = bucket ; } [ ] [ pkgs.awscli pkgs.coreutils ] ;
+        aws-s3-dir = name : aws-access-key-id : aws-secret-access-key : aws-default-region : bucket : utils.sh-derivation name { bucket = bucket ; } [ ] [ pkgs.awscli ] ;
+	aws-s3-dir-retire = name : structure-dir : aws-access-key-id : aws-secret-access-key : aws-default-region : bucket : utils.sh-derivation name { structure-dir = structure-dir ; bucket = bucket ; } [ ] [ pkgs.awscli pkgs.coreutils ] ;
 	destructor = name : utils.sh-derivation name { } [ ] [ pkgs.coreutils ] ;
 	dot-gnupg = name : gpg-private-keys : gpg-ownertrust : gpg2-private-keys : gpg2-ownertrust : utils.sh-derivation name { gpg-private-keys = gpg-private-keys ; gpg-ownertrust = gpg-ownertrust ; gpg2-private-keys = gpg2-private-keys ; gpg2-ownertrust = gpg2-ownertrust ; } [ ] [ pkgs.coreutils pkgs.gnupg ] ;
 	fetchFromGitHub = name : owner : repo : rev : sha256 : pkgs.stdenv.mkDerivation {
@@ -131,7 +131,7 @@ EOF
 	structure = name : constructor-program : destructor : { structures-dir ? "/home/user/.structures" , has-scheduled-destruction ? false , cleaner-program ? "${ pkgs.coreutils }/bin/true" , salt ? "" , salt-program ? "${ pkgs.coreutils }/bin/true" , seconds ? 60 * 60 } : utils.sh-derivation name { structures-dir = literal structures-dir ; constructor-program = literal constructor-program ; has-scheduled-destruction = literal has-scheduled-destruction ; cleaner-program = literal cleaner-program ; salt = literal salt ; salt-program = literal salt-program ; seconds = literal seconds ; destructor-program = literal "${ destructor }/bin/destructor" ; } [ ] [ pkgs.coreutils pkgs.utillinux ] ;
     } ;
     structures = {
-        aws-s3-dir = bucket : utils.structure "${ derivations.aws-s3-dir bucket }/bin/aws-s3-dir" { } ;
+        aws-s3-dir = aws-access-key-id : aws-secret-access-key : aws-default-region : bucket : utils.structure "${ derivations.aws-s3-dir aws-access-key-id aws-secret-access-key aws-default-region bucket }/bin/aws-s3-dir" { } ;
         dot-gnupg = gpg-private-keys : gpg-ownertrust : gpg2-private-keys : gpg2-ownertrust : utils.structure "${ derivations.dot-gnupg gpg-private-keys gpg-ownertrust gpg2-private-keys gpg2-ownertrust }/bin/dot-gnupg" { } ;
         foo = uuid : utils.structure "${ derivations.foo uuid }/bin/foo" { } ;
 	github-create-public-key = personal-access-token : title : ssh-public-key : utils.structure "${ derivations.github-create-public-key personal-access-token title ssh-public-key }/bin/github-create-public-key" { } ;
@@ -206,7 +206,12 @@ in {
         } ;
     } ;
     shell = let
-        aws-s3-dir = structures.aws-s3-dir ( literal "bffbdc36-383c-4b4e-b041-a420f3bf146c" ) ;
+        aws = {
+	    aws-access-key-id = literal "AKIAYZXVAKILLINJD77P" ;
+	    aws-secret-access-key = structure-cat "secret.asc" ( structures.pass-file ( literal "iam/AKIAYZXVAKILLINJD77P" ) ( structure-dir ( structures.dot-gnupg ( literal ./private/gpg-private-keys.asc ) ( literal ./private/gpg-ownertrust.asc ) ( literal ./private/gpg2-private-keys.asc ) ( literal ./private/gpg2-ownertrust.asc ) ) ) ( literal ( derivations.fetchFromGitHub "nextmoose" "secrets" boot-commit boot-sha256 ) ) ) ;
+	    aws-default-region = literal "us-east-1" ;
+        } ;
+        aws-s3-dir = structures.aws-s3-dir aws.aws-access-key-id aws.aws-secret-access-key aws.aws-default-region ( literal "bffbdc36-383c-4b4e-b041-a420f3bf146c" ) ;
         boot-commit = "da590c0eefeb80b4691b99854df13a5e037a50db" ;
 	boot-sha256 = "1ssm4bmmds58y8rim8w1x77cgn81lsdr7sfrhz8wr1c5rjjjc2xi" ;
         boot = {
@@ -256,7 +261,7 @@ in {
 	        ${ github-delete-public-key create-public-key.upstream }/bin/structure &&
 	            ${ github-delete-public-key create-public-key.personal }/bin/structure &&
 	            ${ github-delete-public-key create-public-key.report }/bin/structure &&
-		    ${ derivations.aws-s3-dir-retire ( structure-dir aws-s3-dir ) ( literal "bffbdc36-383c-4b4e-b041-a420f3bf146c" ) }/bin/aws-s3-dir-retire &&
+		    ${ derivations.aws-s3-dir-retire aws.aws-access-key-id aws.aws-secret-access-key aws.aws-default-region ( structure-dir aws-s3-dir ) ( literal "bffbdc36-383c-4b4e-b041-a420f3bf146c" ) }/bin/aws-s3-dir-retire &&
 		    true
 	    } &&
 	        trap cleanup EXIT &&
