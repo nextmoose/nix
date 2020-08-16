@@ -214,7 +214,7 @@ in {
 	    aws-default-region = literal "us-east-1" ;
         } ;
         aws-s3-dir = structures.aws-s3-dir aws.aws-access-key-id aws.aws-secret-access-key aws.aws-default-region ( literal "bffbdc36-383c-4b4e-b041-a420f3bf146c" ) ;
-        s3fs = structures.aws-s3-dir aws.aws-access-key-id aws.aws-secret-access-key aws.aws-default-region ( literal "de910e42-98cb-4a4c-998b-b570c5bd687f" ) ;
+        s3fs = structures.s3fs aws.aws-access-key-id aws.aws-secret-access-key aws.aws-default-region ( literal "de910e42-98cb-4a4c-998b-b570c5bd687f" ) ;
         boot-commit = "da590c0eefeb80b4691b99854df13a5e037a50db" ;
 	boot-sha256 = "1ssm4bmmds58y8rim8w1x77cgn81lsdr7sfrhz8wr1c5rjjjc2xi" ;
         boot = {
