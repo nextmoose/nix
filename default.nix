@@ -111,7 +111,8 @@ EOF
 	personal-identification-number = name : digits : uuid : utils.sh-derivation name { digits = digits ; uuid = uuid ; } [ ] [ pkgs.coreutils ] ;
 	post-commit = name : remote : utils.sh-derivation name { remote = remote ; } [ ] [ pkgs.coreutils pkgs.git ] ;
 	rebuild-nixos = name : utils.sh-derivation name { } [ ] [ pkgs.coreutils pkgs.gnugrep pkgs.rsync pkgs.systemd ] ;
-        s3fs = name : home : bucket : utils.sh-derivation name { home = home ; bucket = bucket ; } [ ] [ pkgs.awscli pkgs.s3fs ] ;
+        s3fs = name : password-file : bucket : utils.sh-derivation name { password-file = password-file ; bucket = bucket ; } [ ] [ pkgs.awscli pkgs.s3fs ] ;
+	s3fs-password = name : aws-access-key-id : aws-secret-access-key : utils.sh-derivation name { aws-access-key-id = aws-access-key-id ; aws-secret-access-key = aws-secret-access-key ; } [ ] [ pkgs.coreutils ] ;
 	shell = name : attribute-name : pkgs.stdenv.mkDerivation {
 	    name = name ;
 	    src = ./public/empty ;
@@ -143,7 +144,8 @@ EOF
 	multiple-site-dot-ssh = configs : utils.structure "${ derivations.multiple-site-dot-ssh configs }/bin/multiple-site-dot-ssh" { } ;
 	pass-file = pass-name : dot-gnupg : password-store-dir : utils.structure "${ derivations.pass-file pass-name dot-gnupg password-store-dir }/bin/pass-file" { } ;
 	personal-identification-number = digits : uuid : utils.structure "${ derivations.personal-identification-number digits uuid }/bin/personal-identification-number" { } ;
-        s3fs = home : bucket : utils.structure "${ derivations.s3fs home bucket }/bin/s3fs" { } ;
+        s3fs = password-file : bucket : utils.structure "${ derivations.s3fs password-file bucket }/bin/s3fs" { } ;
+	s3fs-password = aws-access-key-id : aws-secret-access-key : "${ derivations.s3fs-password aws-access-key-id aws-secret-access-key }/bin/s3fs-password" { } ;
 	single-site-dot-ssh = host : host-name : user : port : identity-file : user-known-hosts-file : utils.structure "${ derivations.single-site-dot-ssh host host-name user port identity-file user-known-hosts-file }/bin/single-site-dot-ssh" { } ;
 	ssh-keygen = passphrase : utils.structure "${ derivations.ssh-keygen passphrase }/bin/ssh-keygen" { } ;
 	temporary = salt : utils.structure "${ pkgs.coreutils }/bin/true" { salt = salt ; } ;
@@ -217,7 +219,8 @@ in {
         } ;
         aws-s3-dir = structures.aws-s3-dir aws.aws-access-key-id aws.aws-secret-access-key aws.aws-default-region ( literal "bffbdc36-383c-4b4e-b041-a420f3bf146c" ) ;
         aws-configure = structures.aws-configure aws.aws-access-key-id aws.aws-secret-access-key aws.aws-default-region ;
-        s3fs = structures.s3fs ( structure-dir aws-configure ) ( literal "de910e42-98cb-4a4c-998b-b570c5bd687f" ) ;
+	s3fs-password = structures.s3fs aws.aws-access-key-id aws.aws-secret-access-key ;
+        s3fs = structures.s3fs ( structure-file "password-file.asc" s3fs-password ) ( literal "de910e42-98cb-4a4c-998b-b570c5bd687f" ) ;
         boot-commit = "da590c0eefeb80b4691b99854df13a5e037a50db" ;
 	boot-sha256 = "1ssm4bmmds58y8rim8w1x77cgn81lsdr7sfrhz8wr1c5rjjjc2xi" ;
         boot = {

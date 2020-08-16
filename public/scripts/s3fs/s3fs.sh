@@ -5,5 +5,5 @@ then
     aws s3api create-bucket --acl private --bucket "${BUCKET}" &&
 	true
 fi &&
-    s3fs "${BUCKET}" . -o "acl=private" &&
+    s3fs "${BUCKET}" . &&
     true
