@@ -5,5 +5,5 @@ then
     aws s3api create-bucket --acl private --bucket "${BUCKET}" &&
 	true
 fi &&
-    s3fs "${BUCKET}" . &&
+    s3fs "${BUCKET}" . "-opasswd_file=${PASSWORD_FILE}" &&
     true
