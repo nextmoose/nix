@@ -145,7 +145,7 @@ EOF
 	pass-file = pass-name : dot-gnupg : password-store-dir : utils.structure "${ derivations.pass-file pass-name dot-gnupg password-store-dir }/bin/pass-file" { } ;
 	personal-identification-number = digits : uuid : utils.structure "${ derivations.personal-identification-number digits uuid }/bin/personal-identification-number" { } ;
         s3fs = password-file : bucket : utils.structure "${ derivations.s3fs password-file bucket }/bin/s3fs" { } ;
-	s3fs-password = aws-access-key-id : aws-secret-access-key : "${ derivations.s3fs-password aws-access-key-id aws-secret-access-key }/bin/s3fs-password" { } ;
+	s3fs-password = aws-access-key-id : aws-secret-access-key : utils.structure "${ derivations.s3fs-password aws-access-key-id aws-secret-access-key }/bin/s3fs-password" { } ;
 	single-site-dot-ssh = host : host-name : user : port : identity-file : user-known-hosts-file : utils.structure "${ derivations.single-site-dot-ssh host host-name user port identity-file user-known-hosts-file }/bin/single-site-dot-ssh" { } ;
 	ssh-keygen = passphrase : utils.structure "${ derivations.ssh-keygen passphrase }/bin/ssh-keygen" { } ;
 	temporary = salt : utils.structure "${ pkgs.coreutils }/bin/true" { salt = salt ; } ;
