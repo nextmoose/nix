@@ -256,7 +256,7 @@ in {
 	        ${ github-delete-public-key create-public-key.upstream }/bin/structure &&
 	            ${ github-delete-public-key create-public-key.personal }/bin/structure &&
 	            ${ github-delete-public-key create-public-key.report }/bin/structure &&
-		    ${ derivations.aws-s3-dir-retire aws-s3-dir literal "bffbdc36-383c-4b4e-b041-a420f3bf146c" ) }/bin/aws-s3-dir-retire &&
+		    ${ derivations.aws-s3-dir-retire aws-s3-dir ( literal "bffbdc36-383c-4b4e-b041-a420f3bf146c" ) }/bin/aws-s3-dir-retire &&
 		    true
 	    } &&
 	        trap cleanup EXIT &&
