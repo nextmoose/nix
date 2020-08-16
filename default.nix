@@ -202,6 +202,8 @@ in {
 	        pkgs.git
 	        pkgs.gnupg
 	        pkgs.gpgme
+		pkgs.keybase
+		pkgs.keybase-gui
 	        pkgs.keychain
  	        pkgs.signing-party
 	        pkgs.pinentry-curses
