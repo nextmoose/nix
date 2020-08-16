@@ -111,7 +111,7 @@ EOF
 	personal-identification-number = name : digits : uuid : utils.sh-derivation name { digits = digits ; uuid = uuid ; } [ ] [ pkgs.coreutils ] ;
 	post-commit = name : remote : utils.sh-derivation name { remote = remote ; } [ ] [ pkgs.coreutils pkgs.git ] ;
 	rebuild-nixos = name : utils.sh-derivation name { } [ ] [ pkgs.coreutils pkgs.gnugrep pkgs.rsync pkgs.systemd ] ;
-        s3fs = name : aws-access-key-id : aws-secret-access-key : aws-default-region : bucket : utils.sh-derivation name { password-file = structure-file "password.asc" ( structures.s3fs-password aws-access-key-id aws-secret-access-key ) ; aws-access-key-id = aws-access-key-id ; aws-secret-access-key = aws-secret-access-key ; aws-default-region = aws-default-region ; bucket = bucket ; } [ ] [ pkgs.awscli pkgs.s3fs ] ;
+        s3fs = name : aws-access-key-id : aws-secret-access-key : aws-default-region : bucket : utils.sh-derivation name { password-file = structure-file "password-file.asc" ( structures.s3fs-password aws-access-key-id aws-secret-access-key ) ; aws-access-key-id = aws-access-key-id ; aws-secret-access-key = aws-secret-access-key ; aws-default-region = aws-default-region ; bucket = bucket ; } [ ] [ pkgs.awscli pkgs.s3fs ] ;
 	s3fs-password = name : aws-access-key-id : aws-secret-access-key : utils.sh-derivation name { aws-access-key-id = aws-access-key-id ; aws-secret-access-key = aws-secret-access-key ; } [ ] [ pkgs.coreutils ] ;
 	shell = name : attribute-name : pkgs.stdenv.mkDerivation {
 	    name = name ;
