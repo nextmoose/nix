@@ -55,6 +55,7 @@
     } ;
     derivations = utils.name-it {
         aws-s3-dir = name : bucket : utils.sh-derivation name { bucket = bucket ; } [ ] [ pkgs.awscli ] ;
+	aws-s3-dir-retire = name : structure-dir : bucket : utils.sh-derivation { structure-dir = structure-dir ; bucket = bucket ; } [ ] [ pkgs.awscli pkgs.coreutils ] ;
 	destructor = name : utils.sh-derivation name { } [ ] [ pkgs.coreutils ] ;
 	dot-gnupg = name : gpg-private-keys : gpg-ownertrust : gpg2-private-keys : gpg2-ownertrust : utils.sh-derivation name { gpg-private-keys = gpg-private-keys ; gpg-ownertrust = gpg-ownertrust ; gpg2-private-keys = gpg2-private-keys ; gpg2-ownertrust = gpg2-ownertrust ; } [ ] [ pkgs.coreutils pkgs.gnupg ] ;
 	fetchFromGitHub = name : owner : repo : rev : sha256 : pkgs.stdenv.mkDerivation {
@@ -130,6 +131,7 @@ EOF
 	structure = name : constructor-program : destructor : { structures-dir ? "/home/user/.structures" , has-scheduled-destruction ? false , cleaner-program ? "${ pkgs.coreutils }/bin/true" , salt ? "" , salt-program ? "${ pkgs.coreutils }/bin/true" , seconds ? 60 * 60 } : utils.sh-derivation name { structures-dir = literal structures-dir ; constructor-program = literal constructor-program ; has-scheduled-destruction = literal has-scheduled-destruction ; cleaner-program = literal cleaner-program ; salt = literal salt ; salt-program = literal salt-program ; seconds = literal seconds ; destructor-program = literal "${ destructor }/bin/destructor" ; } [ ] [ pkgs.coreutils pkgs.utillinux ] ;
     } ;
     structures = {
+        aws-s3-dir = bucket : utils.structure "${ derivations.aws-s3-dir bucket }/bin/aws-s3-dir" { } ;
         dot-gnupg = gpg-private-keys : gpg-ownertrust : gpg2-private-keys : gpg2-ownertrust : utils.structure "${ derivations.dot-gnupg gpg-private-keys gpg-ownertrust gpg2-private-keys gpg2-ownertrust }/bin/dot-gnupg" { } ;
         foo = uuid : utils.structure "${ derivations.foo uuid }/bin/foo" { } ;
 	github-create-public-key = personal-access-token : title : ssh-public-key : utils.structure "${ derivations.github-create-public-key personal-access-token title ssh-public-key }/bin/github-create-public-key" { } ;
@@ -204,6 +206,7 @@ in {
         } ;
     } ;
     shell = let
+        aws-s3-dir = aws-s3-dir ( literal "bffbdc36-383c-4b4e-b041-a420f3bf146c" ) ;
         boot-commit = "da590c0eefeb80b4691b99854df13a5e037a50db" ;
 	boot-sha256 = "1ssm4bmmds58y8rim8w1x77cgn81lsdr7sfrhz8wr1c5rjjjc2xi" ;
         boot = {
@@ -253,6 +256,7 @@ in {
 	        ${ github-delete-public-key create-public-key.upstream }/bin/structure &&
 	            ${ github-delete-public-key create-public-key.personal }/bin/structure &&
 	            ${ github-delete-public-key create-public-key.report }/bin/structure &&
+		    ${ derivations.aws-s3-dir-retire aws-s3-dir ( literal "bffbdc36-383c-4b4e-b041-a420f3bf146c" ) }/bin/aws-s3-dir-retire &&
 		    true
 	    } &&
 	        trap cleanup EXIT &&
@@ -264,7 +268,7 @@ in {
 	        ${ system-secrets }/bin/system-secrets kludge-pinentry user-known-hosts &&
 	        ${ builtins.concatStringsSep "&& \n" ( builtins.map ( secret : "source ${ secret }/completions.sh" ) secrets ) }
 		export NIX_IDE=$( ${ nix-ide }/bin/structure ) &&
-		export HOME=$( ${ structures.temporary "8d5c342f-8d6e-479f-a2cf-590016c2b61e" }/bin/structure ) &&
+		export HOME=$( ${ aws-s3-dir }/bin/structure ) &&
 		cd $HOME &&
 		true
 	'' ;
