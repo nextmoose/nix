@@ -54,6 +54,7 @@
 	upper-case = string : builtins.replaceStrings [ "-" "a" "b" "c" "d" "e" "f" "g" "h" "i" "j" "k" "l" "m" "n" "o" "p" "q" "r" "s" "t" "u" "v" "w" "x" "y" "z" ] [ "_" "A" "B" "C" "D" "E" "F" "G" "H" "I" "J" "K" "L" "M" "N" "O" "P" "Q" "R" "S" "T" "U" "V" "W" "X" "Y" "Z" ] string ;
     } ;
     derivations = utils.name-it {
+        aws-configure = name : aws-access-key-id : aws-secret-access-key : aws-default-region : utils.sh-derivation name { aws-access-key-id = aws-access-key-id ; aws-secret-access-key = aws-secret-access-key ; aws-default-region = aws-default-region ; } [ ] [ pkgs.coreutils pkgs.awscli ] ;
         aws-s3-dir = name : aws-access-key-id : aws-secret-access-key : aws-default-region : bucket : utils.sh-derivation name { aws-access-key-id = aws-access-key-id ; aws-secret-access-key = aws-secret-access-key ; aws-default-region = aws-default-region ; bucket = bucket ; } [ ] [ pkgs.awscli ] ;
 	aws-s3-dir-retire = name : structure-dir : aws-access-key-id : aws-secret-access-key : aws-default-region : bucket : utils.sh-derivation name { structure-dir = structure-dir ; aws-access-key-id = aws-access-key-id ; aws-secret-access-key = aws-secret-access-key ; aws-default-region = aws-default-region ; bucket = bucket ; } [ ] [ pkgs.awscli pkgs.coreutils ] ;
 	destructor = name : utils.sh-derivation name { } [ ] [ pkgs.coreutils ] ;
@@ -110,7 +111,7 @@ EOF
 	personal-identification-number = name : digits : uuid : utils.sh-derivation name { digits = digits ; uuid = uuid ; } [ ] [ pkgs.coreutils ] ;
 	post-commit = name : remote : utils.sh-derivation name { remote = remote ; } [ ] [ pkgs.coreutils pkgs.git ] ;
 	rebuild-nixos = name : utils.sh-derivation name { } [ ] [ pkgs.coreutils pkgs.gnugrep pkgs.rsync pkgs.systemd ] ;
-        s3fs = name : aws-access-key-id : aws-secret-access-key : aws-default-region : bucket : utils.sh-derivation name { aws-access-key-id = aws-access-key-id ; aws-secret-access-key = aws-secret-access-key ; aws-default-region = aws-default-region ; bucket = bucket ; } [ ] [ pkgs.awscli pkgs.s3fs ] ;
+        s3fs = name : home : bucket : utils.sh-derivation name { home = home ; bucket = bucket ; } [ ] [ pkgs.awscli pkgs.s3fs ] ;
 	shell = name : attribute-name : pkgs.stdenv.mkDerivation {
 	    name = name ;
 	    src = ./public/empty ;
@@ -132,6 +133,7 @@ EOF
 	structure = name : constructor-program : destructor : { structures-dir ? "/home/user/.structures" , has-scheduled-destruction ? false , cleaner-program ? "${ pkgs.coreutils }/bin/true" , salt ? "" , salt-program ? "${ pkgs.coreutils }/bin/true" , seconds ? 60 * 60 } : utils.sh-derivation name { structures-dir = literal structures-dir ; constructor-program = literal constructor-program ; has-scheduled-destruction = literal has-scheduled-destruction ; cleaner-program = literal cleaner-program ; salt = literal salt ; salt-program = literal salt-program ; seconds = literal seconds ; destructor-program = literal "${ destructor }/bin/destructor" ; } [ ] [ pkgs.coreutils pkgs.utillinux ] ;
     } ;
     structures = {
+        aws-configure = aws-access-key-id : aws-secret-access-key : aws-default-region : utils.structure "${ derivations.aws-configure aws-access-key-id aws-secret-access-key aws-default-region }/bin/aws-configure" { } ;
         aws-s3-dir = aws-access-key-id : aws-secret-access-key : aws-default-region : bucket : utils.structure "${ derivations.aws-s3-dir aws-access-key-id aws-secret-access-key aws-default-region bucket }/bin/aws-s3-dir" { } ;
         dot-gnupg = gpg-private-keys : gpg-ownertrust : gpg2-private-keys : gpg2-ownertrust : utils.structure "${ derivations.dot-gnupg gpg-private-keys gpg-ownertrust gpg2-private-keys gpg2-ownertrust }/bin/dot-gnupg" { } ;
         foo = uuid : utils.structure "${ derivations.foo uuid }/bin/foo" { } ;
@@ -141,7 +143,7 @@ EOF
 	multiple-site-dot-ssh = configs : utils.structure "${ derivations.multiple-site-dot-ssh configs }/bin/multiple-site-dot-ssh" { } ;
 	pass-file = pass-name : dot-gnupg : password-store-dir : utils.structure "${ derivations.pass-file pass-name dot-gnupg password-store-dir }/bin/pass-file" { } ;
 	personal-identification-number = digits : uuid : utils.structure "${ derivations.personal-identification-number digits uuid }/bin/personal-identification-number" { } ;
-        s3fs = aws-access-key-id : aws-secret-access-key : aws-default-region : bucket : utils.structure "${ derivations.s3fs aws-access-key-id aws-secret-access-key aws-default-region bucket }/bin/s3fs" { } ;
+        s3fs = home : bucket : utils.structure "${ derivations.s3fs home bucket }/bin/s3fs" { } ;
 	single-site-dot-ssh = host : host-name : user : port : identity-file : user-known-hosts-file : utils.structure "${ derivations.single-site-dot-ssh host host-name user port identity-file user-known-hosts-file }/bin/single-site-dot-ssh" { } ;
 	ssh-keygen = passphrase : utils.structure "${ derivations.ssh-keygen passphrase }/bin/ssh-keygen" { } ;
 	temporary = salt : utils.structure "${ pkgs.coreutils }/bin/true" { salt = salt ; } ;
@@ -214,7 +216,8 @@ in {
 	    aws-default-region = literal "us-east-1" ;
         } ;
         aws-s3-dir = structures.aws-s3-dir aws.aws-access-key-id aws.aws-secret-access-key aws.aws-default-region ( literal "bffbdc36-383c-4b4e-b041-a420f3bf146c" ) ;
-        s3fs = structures.s3fs aws.aws-access-key-id aws.aws-secret-access-key aws.aws-default-region ( literal "de910e42-98cb-4a4c-998b-b570c5bd687f" ) ;
+        aws-configure = structures.configure aws.aws-access-key-id aws.aws-secret-access-key aws.aws-default-region ;
+        s3fs = structures.s3fs ( structure-dir aws-configure ) ( literal "de910e42-98cb-4a4c-998b-b570c5bd687f" ) ;
         boot-commit = "da590c0eefeb80b4691b99854df13a5e037a50db" ;
 	boot-sha256 = "1ssm4bmmds58y8rim8w1x77cgn81lsdr7sfrhz8wr1c5rjjjc2xi" ;
         boot = {
