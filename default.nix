@@ -183,7 +183,7 @@ in {
 	        enable = true ;
 	    } ;
 	    keybase.enable = true ;
-	    kfbs.enable = true ;
+	    kbfs.enable = true ;
 	    sshd.enable = true ;
             xserver = {
                 enable = true ;
