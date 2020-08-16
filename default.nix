@@ -182,6 +182,8 @@ in {
 	        allowEveryone = true ;
 	        enable = true ;
 	    } ;
+	    keybase.enable = true ;
+	    kfbs.enable = true ;
 	    sshd.enable = true ;
             xserver = {
                 enable = true ;
