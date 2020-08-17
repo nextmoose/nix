@@ -293,6 +293,7 @@ in {
 	    pkgs.awscli
 	    ( derivations.firefox ( structure-dir ( structures.temporary "b1f835d0-95cd-4201-b9b8-84693f9a049e" ) ) )
 	    pkgs.s3fs
+	    pkgs.encfs
 	    pkgs.keybase
 	    pkgs.kbfs
 	    pkgs.keybase-gui
