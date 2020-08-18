@@ -132,6 +132,7 @@ EOF
 	} ;
 	ssh-keygen = name : passphrase : utils.sh-derivation name { passphrase = passphrase ; } [ ] [ pkgs.coreutils pkgs.openssh ] ;
 	structure = name : constructor-program : destructor : { structures-dir ? "/home/user/.structures" , has-scheduled-destruction ? false , cleaner-program ? "${ pkgs.coreutils }/bin/true" , salt ? "" , salt-program ? "${ pkgs.coreutils }/bin/true" , seconds ? 60 * 60 } : utils.sh-derivation name { structures-dir = literal structures-dir ; constructor-program = literal constructor-program ; has-scheduled-destruction = literal has-scheduled-destruction ; cleaner-program = literal cleaner-program ; salt = literal salt ; salt-program = literal salt-program ; seconds = literal seconds ; destructor-program = literal "${ destructor }/bin/destructor" ; } [ ] [ pkgs.coreutils pkgs.utillinux ] ;
+	umount = name : mount-point : utils.sh-derivation name { mount-point = mount-point ; } [ ] [ pkgs.utillinux ] ;
     } ;
     structures = {
         aws-configure = aws-access-key-id : aws-secret-access-key : aws-default-region : utils.structure "${ derivations.aws-configure aws-access-key-id aws-secret-access-key aws-default-region }/bin/aws-configure" { } ;
